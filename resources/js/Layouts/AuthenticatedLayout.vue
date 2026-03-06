@@ -93,13 +93,10 @@ const authUserName = computed(() => {
                         class="rounded-3xl border border-[color:var(--line)] bg-white/90 p-4 shadow-[0_18px_40px_rgba(15,23,42,0.05)] lg:hidden"
                     >
                         <div class="flex items-center justify-between gap-4">
-                            <Link :href="route('dashboard')" class="flex min-w-0 items-center gap-3">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[color:var(--accent-soft)]">
-                                    <ApplicationLogo class="h-6 w-6 text-[color:var(--accent)]" />
-                                </div>
+                            <Link :href="route('dashboard')" class="flex min-w-0 items-center">
                                 <div class="min-w-0">
                                     <div class="truncate text-sm font-semibold text-[color:var(--ink)]">
-                                        Construction App
+                                        PÄRLIKEE
                                     </div>
                                     <div class="truncate text-xs text-[color:var(--slate-soft)]">
                                         {{ authUserName }}
