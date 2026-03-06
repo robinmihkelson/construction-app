@@ -38,7 +38,7 @@ const CONTENT = {
       { title: 'Asuinrakennuksen saneeraus', meta: 'Tartto • sisäviimeistely', image: '/images/portfolio/renovation.webp' },
       { title: 'Asunnon täydellinen uudistus', meta: 'Vantaa • ulkotyöt', image: '/images/portfolio/house.webp' },
       { title: 'Tenniskeskuksen Maalaus', meta: 'Talin Tenniskeskus, Helsinki • ulkotyöt', image: '/images/portfolio/tennis.webp' },
-      { title: 'Keittiöremontti', meta: 'Helsingi • muutostyö', image: '/images/portfolio/kitchen.webp' },
+      { title: 'Keittiöremontti', meta: 'Helsingi • sisäviimeistely', image: '/images/portfolio/kitchen.webp' },
       { title: 'Asunnon rakentaminen', meta: 'Tikkurila, Vantaa • rakentaminen', image: '/images/portfolio/katu10.webp' },
       { title: 'Kylpyhuoneremontti', meta: 'Helsinki • sisäviimeistely', image: '/images/portfolio/bathroom.webp' },
     ],
