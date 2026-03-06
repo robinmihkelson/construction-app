@@ -53,7 +53,7 @@ function relativeTime(isoString) {
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Activity" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -61,7 +61,7 @@ function relativeTime(isoString) {
                 <div>
                     <div class="text-sm font-medium text-[color:var(--slate-soft)]">Overview</div>
                     <h2 class="text-3xl font-semibold leading-tight text-[color:var(--ink)]">
-                        Operations dashboard
+                        Activity
                     </h2>
                 </div>
             </div>

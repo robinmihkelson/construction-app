@@ -42,7 +42,7 @@ const authUserName = computed(() => {
 
                         <nav class="mt-6 space-y-1">
                             <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                                Dashboard
+                                Activity
                             </NavLink>
                             <NavLink :href="route('projects.index')" :active="route().current('projects.*')">
                                 Projects
@@ -124,7 +124,7 @@ const authUserName = computed(() => {
 
                         <div v-if="showingNavigationDropdown" class="mt-4 space-y-2 border-t border-[color:var(--line)] pt-4">
                             <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                                Dashboard
+                                Activity
                             </ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('projects.index')" :active="route().current('projects.*')">
                                 Projects
@@ -156,18 +156,13 @@ const authUserName = computed(() => {
                     </div>
 
                     <div
-                        class="mb-6 mt-6 flex flex-col gap-3 rounded-3xl border border-[color:var(--line)] bg-white/85 px-5 py-4 shadow-[0_18px_40px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between lg:mt-0"
+                        class="mb-6 mt-6 ml-auto flex w-fit items-center rounded-3xl border border-[color:var(--line)] bg-white/85 px-3 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.04)] lg:mt-0"
                     >
-                        <div>
-                            <div class="text-xl font-medium text-[color:var(--slate-soft)]">
-                                Operations
-                            </div>
-                        </div>
                         <Link
                             href="/"
                             class="inline-flex items-center rounded-2xl border border-[color:var(--line)] bg-white px-4 py-2.5 text-sm font-medium text-[color:var(--slate)] transition hover:bg-[color:var(--panel-muted)]"
                         >
-                            View Website
+                            Visit Website
                         </Link>
                     </div>
 

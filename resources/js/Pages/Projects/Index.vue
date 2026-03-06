@@ -40,9 +40,6 @@ const form = useForm({
                         Total Projects
                     </div>
                     <div class="mt-3 text-4xl font-semibold text-[color:var(--ink)]">{{ projects.length }}</div>
-                    <div class="mt-2 text-sm text-[color:var(--slate-soft)]">
-                        Every project entry still opens the same detail screen and actions.
-                    </div>
                 </div>
             </div>
         </section>

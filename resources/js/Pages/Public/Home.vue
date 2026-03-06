@@ -19,8 +19,8 @@ const CONTENT = {
     processSteps: [
       'Asutatud 2016. aastal',
       'Tegeleme Soomes ja Eestis.',
-      'Haldame teostust ja hoiame kliendi kursis.',
-      'Anname töö üle korrastatud ja dokumenteeritud kujul.',
+      'Korraldame ehitust ja suhtleme kliendiga jooksvalt.',
+      'Anname töö üle korrastatult ja dokumenteeritult.',
     ],
     valueTitle: 'Miks kliendid valivad meid',
     valueBody:
@@ -79,8 +79,8 @@ const CONTENT = {
     processSteps: [
       'Established in 2016',
       'Based in Finland and Estonia',
-      'We manage delivery and keep the client informed.',
-      'We hand over the project clean, organized, and documented.',
+      'We organize construction and communicate with the client on an ongoing basis.',
+      'We deliver the work in an organized and documented manner.',
     ],
     valueTitle: 'Why clients choose us',
     valueBody:
@@ -139,8 +139,8 @@ const CONTENT = {
     processSteps: [
       'Perustettu vuonna 2016',
       'Toimipaikka Suomessa ja Virossa',
-      'Johdamme toteutusta ja pidämme asiakkaan ajan tasalla.',
-      'Luovutamme työn siistinä, hallittuna ja dokumentoituna.',
+      'Järjestämme rakentamista ja olemme jatkuvasti yhteydessä asiakkaaseen.',
+      'Toimitamme työt järjestelmällisesti ja dokumentoidusti.',
     ],
     valueTitle: 'Miksi asiakkaat valitsevat meidät',
     valueBody:
