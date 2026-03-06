@@ -10,8 +10,8 @@ const CONTENT = {
     cta: 'Alusta oma projektiga',
     projects: [
       { title: 'Korteri värvimine', meta: 'Tartu • siseviimistlus', image: '/images/portfolio/renovation.webp' },
-      { title: 'Maja täielik uuendus', meta: 'Vantaa • välitööd', image: '/images/portfolio/house.webp' },
-      { title: 'Tennisekeskuse värvimine', meta: 'Tali Tennisekeskus, Helsingi • välitööd', image: '/images/portfolio/tennis.webp' },
+      { title: 'Maja täielik uuendus', meta: 'Vantaa • välistööd', image: '/images/portfolio/house.webp' },
+      { title: 'Tennisekeskuse värvimine', meta: 'Tali Tennisekeskus, Helsingi • välistööd', image: '/images/portfolio/tennis.webp' },
       { title: 'Köögi renoveerimine', meta: 'Helsingi • siseviimistlus', image: '/images/portfolio/kitchen.webp' },
       { title: 'Korteri ehitus', meta: 'Tikkruila, Vantaa • ehitus', image: '/images/portfolio/katu10.webp' },
       { title: 'Vannitoa renoveerimine', meta: 'Helsingi • siseviimistlus', image: '/images/portfolio/bathroom.webp' },
