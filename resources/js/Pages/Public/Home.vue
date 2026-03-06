@@ -12,7 +12,7 @@ const CONTENT = {
     primaryCta: 'Küsi hinnapakkumist',
     secondaryCta: 'Vaata tehtud töid',
     stats: [
-      { value: 10, suffix: '+', label: 'aastat kogemust' },
+      { value: 10, label: 'aastat kogemust' },
       { value: 100, suffix: '+', label: 'valminud objekti' },
     ],
     processTitle: 'Meist',
@@ -72,7 +72,7 @@ const CONTENT = {
     primaryCta: 'Request a quote',
     secondaryCta: 'View portfolio',
     stats: [
-      { value: 10, suffix: '+', label: 'years of experience' },
+      { value: 10, label: 'years of experience' },
       { value: 100, suffix: '+', label: 'completed sites' },
     ],
     processTitle: 'About us',
@@ -132,7 +132,7 @@ const CONTENT = {
     primaryCta: 'Pyydä tarjous',
     secondaryCta: 'Katso referenssit',
     stats: [
-      { value: 10, suffix: '+', label: 'vuotta kokemusta' },
+      { value: 10, label: 'vuotta kokemusta' },
       { value: 100, suffix: '+', label: 'valmista kohdetta' },
     ],
     processTitle: 'Tietoja meistä',
