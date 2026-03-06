@@ -8,7 +8,7 @@ const CONTENT = {
     badge: 'Usaldusväärne ehituspartner',
     heroTitle: 'Ehitusprojektid, mis liiguvad plaanipäraselt ja valmivad korrektselt.',
     heroBody:
-      'Renoveerimine, üldehitus ja fassaaditööd era- ning ärikliendile. Üks meeskond, üks tööplaan, selge ülevaade kogu protsessi vältel.',
+      'Renoveerimine, üldehitus ja fassaaditööd era- ning ärikliendile. Üks meeskond, üks tööplaan.',
     primaryCta: 'Küsi hinnapakkumist',
     secondaryCta: 'Vaata tehtud töid',
     stats: [
@@ -68,7 +68,7 @@ const CONTENT = {
     badge: 'Reliable construction partner',
     heroTitle: 'Construction projects that stay on schedule and finish cleanly.',
     heroBody:
-      'Renovation, general construction, and facade work for residential and commercial clients. One team, one delivery plan, clear visibility from start to finish.',
+      'Renovation, general construction, and facade work for residential and commercial clients. One team, one delivery plan.',
     primaryCta: 'Request a quote',
     secondaryCta: 'View portfolio',
     stats: [
@@ -128,7 +128,7 @@ const CONTENT = {
     badge: 'Luotettava rakennuskumppani',
     heroTitle: 'Rakennusprojektit, jotka etenevät suunnitelman mukaan ja valmistuvat siististi.',
     heroBody:
-      'Saneeraus, yleisrakentaminen ja julkisivutyöt asunto- ja yritysasiakkaille. Yksi tiimi, yksi toteutussuunnitelma ja selkeä näkyvyys koko projektin ajan.',
+      'Saneeraus, yleisrakentaminen ja julkisivutyöt asunto- ja yritysasiakkaille. Yksi tiimi, yksi toteutussuunnitelma.',
     primaryCta: 'Pyydä tarjous',
     secondaryCta: 'Katso referenssit',
     stats: [

@@ -21,7 +21,7 @@ class InquiryController extends Controller
         $data['status'] = 'new';
         Inquiry::create($data);
 
-        return back()->with('success', true);
+        return back()->with('success', 'Inquiry received successfully.');
     }
 
 
@@ -90,7 +90,14 @@ class InquiryController extends Controller
 
     $inquiry->update(['status' => $data['status']]);
 
-    return back()->with('success', true);
+    $message = match ($data['status']) {
+        'new' => 'Inquiry moved to new.',
+        'contacted' => 'Inquiry marked as contacted.',
+        'converted' => 'Inquiry marked as converted.',
+        default => 'Inquiry status updated.',
+    };
+
+    return back()->with('success', $message);
     }
 
 
