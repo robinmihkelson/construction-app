@@ -92,7 +92,7 @@ const copy = computed(() => CONTENT[locale.value] ?? CONTENT.et)
 <template>
   <PublicLayout>
     <section class="mx-auto max-w-[92rem] px-4 py-14 xl:px-6">
-      <div data-reveal="curtain" class="border border-slate-800 bg-slate-950 p-8 text-white shadow-[0_22px_44px_rgba(15,23,42,0.14)]">
+      <div data-nav-logo-tone="inverse" data-reveal="curtain" class="border border-slate-800 bg-slate-950 p-8 text-white shadow-[0_22px_44px_rgba(15,23,42,0.14)]">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div class="max-w-3xl">
             <div class="text-sm font-semibold uppercase tracking-[0.14em] text-amber-300">{{ copy.title }}</div>

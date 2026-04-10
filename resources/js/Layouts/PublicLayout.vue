@@ -10,7 +10,11 @@ const pageUrl = computed(() => page.url ?? '/')
 const mobileOpen = ref(false)
 const scrolled = ref(false)
 const scrollProgress = ref(0)
+const headerRef = ref(null)
+const logoRef = ref(null)
+const logoTone = ref('default')
 let revealObserver = null
+let logoToneFrame = null
 
 const locales = [
   { code: 'et', label: 'Eesti', flag: '/images/flags/et.webp' },
@@ -47,7 +51,9 @@ function isActive(href) {
 
 function navClasses(href) {
   return isActive(href)
-    ? 'inline-flex items-center whitespace-nowrap border-b-2 border-amber-400 px-1 pb-2 pt-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-slate-950'
+    ? `inline-flex items-center whitespace-nowrap border-b-2 border-amber-400 px-1 pb-2 pt-2 text-[12px] font-semibold uppercase tracking-[0.14em] transition-colors ${
+        logoTone.value === 'inverse' ? 'text-white' : 'text-slate-950'
+      }`
     : 'inline-flex items-center whitespace-nowrap border-b-2 border-transparent px-1 pb-2 pt-2 text-[12px] font-medium uppercase tracking-[0.14em] text-slate-500 transition hover:text-slate-950'
 }
 
@@ -62,6 +68,56 @@ function onScroll() {
   const doc = document.documentElement
   const range = doc.scrollHeight - window.innerHeight
   scrollProgress.value = range > 0 ? Math.min(1, Math.max(0, window.scrollY / range)) : 0
+  scheduleLogoToneCheck()
+}
+
+function resolveLogoToneFromPoint(x, y) {
+  const stack = document
+    .elementsFromPoint(x, y)
+    .filter((element) => !headerRef.value?.contains(element))
+
+  for (const element of stack) {
+    const toneHost = element.closest?.('[data-nav-logo-tone]')
+    const tone = toneHost?.getAttribute('data-nav-logo-tone')
+
+    if (tone === 'inverse' || tone === 'default') {
+      return tone
+    }
+  }
+
+  return 'default'
+}
+
+function updateLogoTone() {
+  if (typeof window === 'undefined' || !logoRef.value) return
+
+  const rect = logoRef.value.getBoundingClientRect()
+  if (!rect.width || !rect.height) return
+
+  const samplePoints = [
+    [rect.left + rect.width * 0.2, rect.top + rect.height * 0.5],
+    [rect.left + rect.width * 0.5, rect.top + rect.height * 0.5],
+    [rect.left + rect.width * 0.8, rect.top + rect.height * 0.5],
+  ]
+
+  let inverseHits = 0
+
+  for (const [x, y] of samplePoints) {
+    if (resolveLogoToneFromPoint(x, y) === 'inverse') {
+      inverseHits += 1
+    }
+  }
+
+  logoTone.value = inverseHits >= 2 ? 'inverse' : 'default'
+}
+
+function scheduleLogoToneCheck() {
+  if (typeof window === 'undefined' || logoToneFrame) return
+
+  logoToneFrame = window.requestAnimationFrame(() => {
+    logoToneFrame = null
+    updateLogoTone()
+  })
 }
 
 function setupScrollReveals() {
@@ -99,17 +155,26 @@ function setupScrollReveals() {
 onMounted(() => {
   onScroll()
   window.addEventListener('scroll', onScroll, { passive: true })
-  nextTick(() => setupScrollReveals())
+  window.addEventListener('resize', scheduleLogoToneCheck, { passive: true })
+  nextTick(() => {
+    setupScrollReveals()
+    updateLogoTone()
+  })
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('resize', scheduleLogoToneCheck)
   if (revealObserver) revealObserver.disconnect()
+  if (logoToneFrame) window.cancelAnimationFrame(logoToneFrame)
 })
 
 watch(pageUrl, () => {
   mobileOpen.value = false
-  nextTick(() => setupScrollReveals())
+  nextTick(() => {
+    setupScrollReveals()
+    updateLogoTone()
+  })
 })
 </script>
 
@@ -118,14 +183,33 @@ watch(pageUrl, () => {
     
 
     <header
-      class="relative sticky top-0 z-50 border-b transition-all duration-200"
-      :class="scrolled ? 'border-slate-300 bg-white/92 backdrop-blur-xl shadow-sm' : 'border-slate-200/70 bg-white/84 backdrop-blur-md'"
+      ref="headerRef"
+      class="relative sticky top-0 z-50 transition-all duration-200"
+      :class="scrolled ? 'bg-white/92 backdrop-blur-xl shadow-sm' : 'bg-white/84 backdrop-blur-md'"
     >
       <div class="mx-auto flex min-h-[5.25rem] max-w-[90rem] items-center justify-between gap-4 px-4 py-3 xl:px-6">
         <Link href="/" class="flex shrink-0 items-center gap-3">
-          <div class="leading-tight">
-            <div class="whitespace-nowrap text-2xl font-semibold tracking-[0.06em] text-slate-950">{{ t('brand_name') }}</div>
-            <div class="hidden whitespace-nowrap text-[11px] uppercase tracking-[0.16em] text-slate-500 xl:block">{{ t('brand_tagline') }}</div>
+          <div
+            ref="logoRef"
+            class="leading-tight px-2 py-1 transition-all duration-200"
+            :class="
+              logoTone === 'inverse'
+                ? 'bg-slate-950/92 shadow-[0_10px_24px_rgba(15,23,42,0.2)]'
+                : 'bg-transparent shadow-none'
+            "
+          >
+            <div
+              class="whitespace-nowrap text-2xl font-semibold tracking-[0.06em] transition-colors duration-200"
+              :class="logoTone === 'inverse' ? 'text-white' : 'text-slate-950'"
+            >
+              {{ t('brand_name') }}
+            </div>
+            <div
+              class="hidden whitespace-nowrap text-[11px] uppercase tracking-[0.16em] transition-colors duration-200 xl:block"
+              :class="logoTone === 'inverse' ? 'text-slate-300' : 'text-slate-500'"
+            >
+              {{ t('brand_tagline') }}
+            </div>
           </div>
         </Link>
 
@@ -252,7 +336,7 @@ watch(pageUrl, () => {
       <slot />
     </main>
 
-    <footer class="mt-20 border-t border-slate-800 bg-slate-950 text-white">
+    <footer data-nav-logo-tone="inverse" class="mt-20 border-t border-slate-800 bg-slate-950 text-white">
       <div class="mx-auto grid max-w-[94rem] gap-10 px-4 py-14 md:grid-cols-[1.4fr_0.8fr_0.8fr] xl:px-6">
         <div>
           <div class="flex items-center gap-3">

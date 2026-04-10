@@ -83,6 +83,10 @@ const form = useForm({
   message: '',
 })
 
+function sanitizePhoneInput(event) {
+  form.phone = event.target.value.replace(/\D+/g, '')
+}
+
 function submit() {
   form.post(route('public.contact.store'), { preserveScroll: true })
 }
@@ -93,7 +97,7 @@ function submit() {
     <section class="mx-auto max-w-[92rem] px-4 py-14 xl:px-6">
       <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <div class="space-y-6">
-          <div data-reveal="slide-right" class="border border-slate-800 bg-slate-950 p-8 text-white shadow-[0_22px_44px_rgba(15,23,42,0.14)]">
+          <div data-nav-logo-tone="inverse" data-reveal="slide-right" class="border border-slate-800 bg-slate-950 p-8 text-white shadow-[0_22px_44px_rgba(15,23,42,0.14)]">
             <h1 class="mt-2 text-4xl font-semibold tracking-tight text-white">{{ copy.title }}</h1>
             <p class="mt-4 text-base leading-7 text-slate-300">{{ copy.body }}</p>
           </div>
@@ -133,6 +137,9 @@ function submit() {
                 <input
                   v-model="form.email"
                   type="email"
+                  inputmode="email"
+                  autocomplete="email"
+                  spellcheck="false"
                   class="mt-2 w-full border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-amber-300 focus:bg-white"
                 />
                 <div v-if="form.errors.email" class="mt-2 text-sm text-red-600">{{ form.errors.email }}</div>
@@ -141,6 +148,11 @@ function submit() {
                 <label class="text-sm font-semibold text-slate-900">{{ copy.fields.phone }}</label>
                 <input
                   v-model="form.phone"
+                  type="tel"
+                  inputmode="numeric"
+                  autocomplete="tel-national"
+                  pattern="[0-9]*"
+                  @input="sanitizePhoneInput"
                   class="mt-2 w-full border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-amber-300 focus:bg-white"
                 />
                 <div v-if="form.errors.phone" class="mt-2 text-sm text-red-600">{{ form.errors.phone }}</div>

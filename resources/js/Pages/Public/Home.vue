@@ -236,7 +236,7 @@ onBeforeUnmount(() => {
 
 <template>
   <PublicLayout>
-    <section class="relative overflow-hidden border-b border-slate-800">
+    <section data-nav-logo-tone="inverse" class="relative overflow-hidden border-b border-slate-800">
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(251,191,36,0.18),transparent_22%),linear-gradient(115deg,rgba(2,6,23,0.95),rgba(15,23,42,0.84)_55%,rgba(30,41,59,0.74))]"></div>
       <div class="absolute inset-y-0 right-0 hidden w-[22%] bg-amber-400/90 lg:block"></div>
       <div class="relative mx-auto max-w-[92rem] px-4 py-16 md:py-24 xl:px-6">
@@ -254,7 +254,7 @@ onBeforeUnmount(() => {
             <h1
               data-reveal="rise"
               style="--reveal-delay: 120ms"
-              class="mt-6 max-w-4xl text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[1.02]"
+              class="mt-6 max-w-4xl text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[1.02] text-balance"
             >
               {{ copy.heroTitle }}
             </h1>
@@ -262,7 +262,7 @@ onBeforeUnmount(() => {
             <p
               data-reveal="rise"
               style="--reveal-delay: 200ms"
-              class="mt-6 max-w-2xl text-base text-slate-300 md:text-lg"
+              class="mt-6 max-w-2xl text-base text-slate-300 md:text-lg text-balance"
             >
               {{ copy.heroBody }}
             </p>
@@ -364,7 +364,7 @@ onBeforeUnmount(() => {
 
     <section class="mx-auto mt-16 max-w-[92rem] px-4 xl:px-6">
       <div class="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
-        <div data-reveal="slide-right" class="flex min-h-[20rem] flex-col justify-between bg-slate-950 p-7 text-white shadow-[0_20px_40px_rgba(15,23,42,0.14)] md:min-h-[15rem]">
+        <div data-nav-logo-tone="inverse" data-reveal="slide-right" class="flex min-h-[20rem] flex-col justify-between bg-slate-950 p-7 text-white shadow-[0_20px_40px_rgba(15,23,42,0.14)] md:min-h-[15rem]">
           <div class="text-base font-semibold uppercase tracking-[0.12em] text-amber-300">{{ copy.proofTitle }}</div>
           <p class="mt-4 max-w-xl text-lg leading-8 text-slate-300">
             {{ copy.proofBody }}
@@ -431,7 +431,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div data-reveal="slide-left" style="--reveal-delay: 130ms" class="bg-[linear-gradient(120deg,#111827,#1f2937)] p-8 text-white shadow-[0_24px_48px_rgba(15,23,42,0.14)]">
+        <div data-nav-logo-tone="inverse" data-reveal="slide-left" style="--reveal-delay: 130ms" class="bg-[linear-gradient(120deg,#111827,#1f2937)] p-8 text-white shadow-[0_24px_48px_rgba(15,23,42,0.14)]">
           <div class="text-sm font-semibold uppercase tracking-[0.14em] text-amber-300">{{ copy.ctaEyebrow }}</div>
           <div class="mt-3 text-3xl font-semibold tracking-tight">{{ copy.ctaTitle }}</div>
           <p class="mt-4 text-sm leading-7 text-slate-300">
