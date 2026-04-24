@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
@@ -48,35 +49,54 @@ class ProjectController extends Controller
         ->orderBy('users.name')
         ->get();
 
-    $project->load([
-        'tasks.assignee:id,name',
-    ]);
-
-    $comments = $project->comments()
-    ->with('user:id,name')
-    ->latest()
-    ->get();
+    $tasks = $project->tasks()
+        ->with([
+            'assignee:id,name',
+            'comments' => fn ($query) => $query->with('user:id,name')->oldest(),
+            'progressImages' => fn ($query) => $query->with('user:id,name')->latest(),
+        ])
+        ->latest()
+        ->get();
 
 
     $users = User::select('id', 'name')->orderBy('name')->get();
 
     return Inertia::render('Projects/Show', [
         'project' => $project,
-        'tasks' => $project->tasks()->latest()->get()->map(function ($task) {
+        'tasks' => $tasks->map(function ($task) {
             return [
                 'id' => $task->id,
                 'title' => $task->title,
+                'description' => $task->description,
                 'status' => $task->status,
                 'due_date' => $task->due_date,
                 'assignee' => $task->assignee ? [
                     'id' => $task->assignee->id,
                     'name' => $task->assignee->name,
                 ] : null,
+                'comments' => $task->comments->map(fn ($comment) => [
+                    'id' => $comment->id,
+                    'body' => $comment->body,
+                    'created_at' => optional($comment->created_at)->toISOString(),
+                    'user' => $comment->user ? [
+                        'id' => $comment->user->id,
+                        'name' => $comment->user->name,
+                    ] : null,
+                ])->values(),
+                'progress_images' => $task->progressImages->map(fn ($image) => [
+                    'id' => $image->id,
+                    'url' => Storage::disk($image->disk)->url($image->path),
+                    'original_name' => $image->original_name,
+                    'created_at' => optional($image->created_at)->toISOString(),
+                    'user' => $image->user ? [
+                        'id' => $image->user->id,
+                        'name' => $image->user->name,
+                    ] : null,
+                ])->values(),
             ];
         }),
         'users' => $users,
         'members' => $members,
-        'comments' => $comments,
 
         'can' => [
             'manageTasks' => Gate::allows('create', [Task::class, $project]),

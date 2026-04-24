@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectCommentController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
+use App\Http\Controllers\TaskCommentController;
+use App\Http\Controllers\TaskProgressImageController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\InquiryController;
@@ -179,6 +181,14 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::post('/projects/{project}/tasks', [ProjectController::class, 'storeTask'])->name('projects.tasks.store');
     Route::patch('/tasks/{task}', [ProjectController::class, 'updateTask'])->name('tasks.update');
+    Route::post('/tasks/{task}/comments', [TaskCommentController::class, 'store'])
+        ->name('tasks.comments.store');
+    Route::delete('/tasks/{task}/comments/{comment}', [TaskCommentController::class, 'destroy'])
+        ->name('tasks.comments.destroy');
+    Route::post('/tasks/{task}/progress-images', [TaskProgressImageController::class, 'store'])
+        ->name('tasks.progress-images.store');
+    Route::delete('/tasks/{task}/progress-images/{image}', [TaskProgressImageController::class, 'destroy'])
+        ->name('tasks.progress-images.destroy');
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{project}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat/{project}/messages', [ChatController::class, 'store'])->name('chat.messages.store');

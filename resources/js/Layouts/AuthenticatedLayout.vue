@@ -23,19 +23,22 @@ const authUserName = computed(() => {
 
 <template>
     <div class="min-h-screen">
-        <div class="mx-auto max-w-[1600px] px-4 py-4 sm:px-6 sm:py-6">
-            <div class="flex flex-col gap-6 lg:flex-row">
-                <aside class="hidden lg:block lg:w-72 lg:shrink-0">
+        <div class="mx-auto max-w-[1480px] px-4 py-4 sm:px-6">
+            <div class="flex flex-col gap-5 lg:flex-row">
+                <aside class="hidden lg:block lg:w-64 lg:shrink-0">
                     <div
-                        class="sticky top-6 flex h-[calc(100vh-3rem)] flex-col rounded-3xl border border-[color:var(--line)] bg-white/90 p-4 shadow-[0_18px_40px_rgba(15,23,42,0.06)] backdrop-blur"
+                        class="sticky top-4 flex h-[calc(100vh-2rem)] flex-col rounded-xl border border-[color:var(--line)] bg-white p-4 shadow-sm"
                     >
                         <Link
                             :href="route('dashboard')"
-                            class="flex items-center gap-3 rounded-2xl px-2 py-2"
+                            class="flex items-center gap-3 rounded-lg px-2 py-2"
                         >
                             <div>
-                                <div class="text-2xl font-bold text-[color:var(--ink)]">
+                                <div class="text-xl font-bold text-[color:var(--ink)]">
                                     PÄRLIKEE
+                                </div>
+                                <div class="text-xs font-medium text-[color:var(--slate-soft)]">
+                                    Workspace
                                 </div>
                             </div>
                         </Link>
@@ -56,7 +59,7 @@ const authUserName = computed(() => {
                         </nav>
 
                         <div class="mt-auto space-y-3">
-                            <div class="rounded-2xl border border-[color:var(--line)] bg-[color:var(--panel-strong)] p-4">
+                            <div class="rounded-lg border border-[color:var(--line)] bg-[color:var(--panel-strong)] p-3">
                                 <div class="text-xs font-medium text-[color:var(--slate-soft)]">
                                     Signed in as
                                 </div>
@@ -71,7 +74,7 @@ const authUserName = computed(() => {
                             <div class="grid grid-cols-2 gap-2">
                                 <Link
                                     :href="route('profile.edit')"
-                                    class="inline-flex items-center justify-center rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--slate)] transition hover:bg-[color:var(--panel-muted)]"
+                                    class="app-button-secondary"
                                 >
                                     Profile
                                 </Link>
@@ -79,7 +82,7 @@ const authUserName = computed(() => {
                                     :href="route('logout')"
                                     method="post"
                                     as="button"
-                                    class="inline-flex items-center justify-center rounded-2xl bg-[color:var(--ink)] px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+                                    class="inline-flex items-center justify-center rounded-lg bg-[color:var(--ink)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
                                 >
                                     Log Out
                                 </Link>
@@ -90,10 +93,10 @@ const authUserName = computed(() => {
 
                 <div class="min-w-0 flex-1">
                     <div
-                        class="rounded-3xl border border-[color:var(--line)] bg-white/90 p-4 shadow-[0_18px_40px_rgba(15,23,42,0.05)] lg:hidden"
+                        class="rounded-xl border border-[color:var(--line)] bg-white p-4 shadow-sm lg:hidden"
                     >
-                        <div class="flex items-center justify-between gap-4">
-                            <Link :href="route('dashboard')" class="flex min-w-0 items-center">
+                        <div class="flex items-center justify-between gap-3">
+                            <Link :href="route('dashboard')" class="flex min-w-0 flex-1 items-center">
                                 <div class="min-w-0">
                                     <div class="truncate text-sm font-semibold text-[color:var(--ink)]">
                                         PÄRLIKEE
@@ -104,19 +107,28 @@ const authUserName = computed(() => {
                                 </div>
                             </Link>
 
-                            <button
-                                @click="showingNavigationDropdown = !showingNavigationDropdown"
-                                class="inline-flex items-center justify-center rounded-2xl border border-[color:var(--line)] bg-[color:var(--panel-strong)] px-3 py-3 text-[color:var(--slate)] transition hover:bg-white focus:outline-none"
-                            >
-                                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path :class="{ hidden: showingNavigationDropdown, 'inline-flex': !showingNavigationDropdown }"
-                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16" />
-                                    <path :class="{ hidden: !showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
-                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
+                            <div class="flex shrink-0 items-center gap-2">
+                                <Link
+                                    href="/"
+                                    class="inline-flex h-[50px] items-center whitespace-nowrap rounded-lg border border-[color:var(--line)] bg-white px-3 text-xs font-semibold text-[color:var(--slate)] transition hover:bg-[color:var(--panel-muted)]"
+                                >
+                                    Back to website
+                                </Link>
+
+                                <button
+                                    @click="showingNavigationDropdown = !showingNavigationDropdown"
+                                    class="inline-flex items-center justify-center rounded-lg border border-[color:var(--line)] bg-[color:var(--panel-strong)] px-3 py-3 text-[color:var(--slate)] transition hover:bg-white focus:outline-none"
+                                >
+                                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                        <path :class="{ hidden: showingNavigationDropdown, 'inline-flex': !showingNavigationDropdown }"
+                                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 6h16M4 12h16M4 18h16" />
+                                        <path :class="{ hidden: !showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
 
                         <div v-if="showingNavigationDropdown" class="mt-4 space-y-2 border-t border-[color:var(--line)] pt-4">
@@ -136,7 +148,7 @@ const authUserName = computed(() => {
                             <div class="grid grid-cols-2 gap-2 pt-2">
                                 <Link
                                     :href="route('profile.edit')"
-                                    class="inline-flex items-center justify-center rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--slate)]"
+                                    class="app-button-secondary"
                                 >
                                     Profile
                                 </Link>
@@ -144,7 +156,7 @@ const authUserName = computed(() => {
                                     :href="route('logout')"
                                     method="post"
                                     as="button"
-                                    class="inline-flex items-center justify-center rounded-2xl bg-[color:var(--ink)] px-4 py-3 text-sm font-medium text-white"
+                                    class="inline-flex items-center justify-center rounded-lg bg-[color:var(--ink)] px-4 py-2.5 text-sm font-semibold text-white"
                                 >
                                     Log Out
                                 </Link>
@@ -152,29 +164,29 @@ const authUserName = computed(() => {
                         </div>
                     </div>
 
-                    <div
-                        class="mb-6 mt-6 ml-auto flex w-fit items-center rounded-3xl border border-[color:var(--line)] bg-white/85 px-3 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.04)] lg:mt-0"
-                    >
-                        <Link
-                            href="/"
-                            class="inline-flex items-center rounded-2xl border border-[color:var(--line)] bg-white px-4 py-2.5 text-sm font-medium text-[color:var(--slate)] transition hover:bg-[color:var(--panel-muted)]"
+                    <div class="mt-5 lg:mt-0">
+                        <div class="mb-5 hidden justify-end lg:flex">
+                            <Link
+                                href="/"
+                                class="app-button-secondary"
+                            >
+                                Back to website
+                            </Link>
+                        </div>
+
+                        <header
+                            v-if="$slots.header"
+                            class="mb-5 border-b border-[color:var(--line)] pb-5"
                         >
-                            Visit Website
-                        </Link>
+                            <slot name="header" />
+                        </header>
+
+                        <FlashMessages />
+
+                        <main class="pb-10">
+                            <slot />
+                        </main>
                     </div>
-
-                    <header
-                        v-if="$slots.header"
-                        class="mb-6 rounded-3xl border border-[color:var(--line)] bg-white/90 p-6 shadow-[0_18px_40px_rgba(15,23,42,0.04)]"
-                    >
-                        <slot name="header" />
-                    </header>
-
-                    <FlashMessages />
-
-                    <main class="pb-10">
-                        <slot />
-                    </main>
                 </div>
             </div>
         </div>

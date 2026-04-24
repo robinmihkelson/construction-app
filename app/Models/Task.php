@@ -19,5 +19,14 @@ class Task extends Model
     {
         return $this->belongsTo(\App\Models\User::class, 'assigned_to');
     }
-}
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function progressImages()
+    {
+        return $this->hasMany(TaskProgressImage::class);
+    }
+}
