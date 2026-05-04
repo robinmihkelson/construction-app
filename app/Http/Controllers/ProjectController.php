@@ -162,7 +162,7 @@ class ProjectController extends Controller
 
         $task->update($data);
 
-        return to_route('projects.show', $task->project_id, 303)->with('success', 'Task updated.');
+        return back(303)->with('success', 'Task updated.');
     }
 
     $this->authorize('update', $task);
@@ -175,7 +175,7 @@ class ProjectController extends Controller
 
     $task->update($data);
 
-    return to_route('projects.show', $task->project_id, 303)->with('success', 'Task updated.');
+    return back(303)->with('success', 'Task updated.');
     }
 
 

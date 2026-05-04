@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskProgressImageController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\InquiryController;
 use App\Models\Inquiry;
@@ -189,6 +190,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('tasks.progress-images.store');
     Route::delete('/tasks/{task}/progress-images/{image}', [TaskProgressImageController::class, 'destroy'])
         ->name('tasks.progress-images.destroy');
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{project}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat/{project}/messages', [ChatController::class, 'store'])->name('chat.messages.store');
