@@ -86,6 +86,8 @@ function openTask(taskId) {
     selectedTaskId.value = taskId
     taskCommentForm.reset('body')
     progressImageForm.reset('images')
+    isEditingDescription.value = false
+    descriptionError.value = ''
     const url = new URL(window.location.href)
     url.searchParams.set('task', taskId)
     window.history.replaceState({}, '', url)
@@ -126,6 +128,51 @@ const renameValue = ref('')
 const renameError = ref('')
 const isSavingRename = ref(false)
 const renameInputEl = ref(null)
+
+const isEditingDescription = ref(false)
+const descriptionValue = ref('')
+const descriptionError = ref('')
+const isSavingDescription = ref(false)
+const descriptionInputEl = ref(null)
+
+async function startEditDescription() {
+    if (!selectedTask.value) return
+    isEditingDescription.value = true
+    descriptionValue.value = selectedTask.value.description ?? ''
+    descriptionError.value = ''
+    await nextTick()
+    if (descriptionInputEl.value) {
+        descriptionInputEl.value.focus()
+    }
+}
+
+function cancelEditDescription() {
+    isEditingDescription.value = false
+    descriptionValue.value = ''
+    descriptionError.value = ''
+}
+
+function saveDescription() {
+    if (!selectedTask.value) return
+    const next = descriptionValue.value
+    const previous = selectedTask.value.description ?? ''
+    if (next === previous) {
+        cancelEditDescription()
+        return
+    }
+
+    isSavingDescription.value = true
+    router.patch(
+        route('tasks.update', selectedTask.value.id),
+        { description: next },
+        {
+            preserveScroll: true,
+            onSuccess: () => cancelEditDescription(),
+            onError: (errors) => { descriptionError.value = errors.description || 'Could not save.' },
+            onFinish: () => { isSavingDescription.value = false },
+        }
+    )
+}
 
 async function startRename() {
     isRenaming.value = true
@@ -489,6 +536,62 @@ function saveRename() {
                                 <span class="app-panel-muted px-3 py-1.5 text-xs text-[var(--slate-soft)]">
                                     Due: <strong class="font-semibold text-[var(--ink)]">{{ selectedTask.due_date ?? 'None' }}</strong>
                                 </span>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mt-4">
+                                <div class="mb-1.5 flex items-center justify-between">
+                                    <div class="app-label">Description</div>
+                                    <button
+                                        v-if="can.manageTasks && !isEditingDescription"
+                                        type="button"
+                                        @click.prevent.stop="startEditDescription"
+                                        class="text-xs font-semibold text-[var(--accent)] transition hover:text-[var(--accent-deep)]"
+                                    >
+                                        {{ selectedTask.description ? 'Edit' : 'Add description' }}
+                                    </button>
+                                </div>
+
+                                <div v-if="!isEditingDescription">
+                                    <p
+                                        v-if="selectedTask.description"
+                                        class="whitespace-pre-wrap break-words rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2.5 text-sm text-[var(--slate)] [overflow-wrap:anywhere]"
+                                    >{{ selectedTask.description }}</p>
+                                    <p v-else class="rounded-lg border border-dashed border-[var(--line)] px-3 py-2.5 text-xs italic text-[var(--slate-soft)]">
+                                        No description yet.
+                                    </p>
+                                </div>
+
+                                <div v-else class="space-y-2">
+                                    <textarea
+                                        ref="descriptionInputEl"
+                                        v-model="descriptionValue"
+                                        :disabled="isSavingDescription"
+                                        rows="4"
+                                        maxlength="10000"
+                                        placeholder="Add details, links, or context for this task…"
+                                        class="app-input w-full text-sm"
+                                    />
+                                    <div v-if="descriptionError" class="text-xs text-rose-600">{{ descriptionError }}</div>
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            @click.prevent.stop="saveDescription"
+                                            :disabled="isSavingDescription"
+                                            class="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[var(--accent-deep)] disabled:opacity-50"
+                                        >
+                                            {{ isSavingDescription ? 'Saving…' : 'Save' }}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click.prevent.stop="cancelEditDescription"
+                                            :disabled="isSavingDescription"
+                                            class="rounded-lg border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)] disabled:opacity-50"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Status switcher -->

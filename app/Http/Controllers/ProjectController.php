@@ -67,7 +67,7 @@ class ProjectController extends Controller
             return [
                 'id' => $task->id,
                 'title' => $task->title,
-                'description' => $task->description,
+                'description' => $task->description ?? '',
                 'status' => $task->status,
                 'due_date' => $task->due_date,
                 'assignee' => $task->assignee ? [
@@ -170,6 +170,7 @@ class ProjectController extends Controller
 
     $data = $request->validate([
         'title' => ['sometimes', 'string', 'max:255'],
+        'description' => ['nullable', 'string', 'max:10000'],
         'assigned_to' => ['nullable', 'exists:users,id'],
         'due_date' => ['nullable', 'date'],
     ]);
