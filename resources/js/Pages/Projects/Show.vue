@@ -5,7 +5,7 @@ export default { layout: AuthenticatedLayout }
 
 <script setup>
 import { useForm, router, Link, usePage } from '@inertiajs/vue3'
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, nextTick, ref, onMounted, onBeforeUnmount } from 'vue'
 
 const page = usePage()
 const currentUser = computed(() => page.props.auth?.user ?? null)
@@ -120,6 +120,53 @@ function deleteProgressImage(imageId) {
     if (!window.confirm('Delete this progress image?')) return
     router.delete(route('tasks.progress-images.destroy', [selectedTask.value.id, imageId]), { preserveScroll: true })
 }
+
+const isRenaming = ref(false)
+const renameValue = ref('')
+const renameError = ref('')
+const isSavingRename = ref(false)
+const renameInputEl = ref(null)
+
+async function startRename() {
+    isRenaming.value = true
+    renameValue.value = props.project?.name ?? ''
+    renameError.value = ''
+    await nextTick()
+    if (renameInputEl.value) {
+        renameInputEl.value.focus()
+        renameInputEl.value.select()
+    }
+}
+
+function cancelRename() {
+    isRenaming.value = false
+    renameValue.value = ''
+    renameError.value = ''
+}
+
+function saveRename() {
+    const name = renameValue.value.trim()
+    if (!name) {
+        renameError.value = 'Name is required.'
+        return
+    }
+    if (name === props.project.name) {
+        cancelRename()
+        return
+    }
+
+    isSavingRename.value = true
+    router.patch(
+        route('projects.update', props.project.id),
+        { name },
+        {
+            preserveScroll: true,
+            onSuccess: () => cancelRename(),
+            onError: (errors) => { renameError.value = errors.name || 'Could not save.' },
+            onFinish: () => { isSavingRename.value = false },
+        }
+    )
+}
 </script>
 
 <template>
@@ -128,11 +175,57 @@ function deleteProgressImage(imageId) {
         <!-- Project header -->
         <div class="app-panel p-5">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div class="min-w-0">
+                <div class="min-w-0 flex-1">
                     <div class="app-label">Project</div>
-                    <h1 class="mt-1 break-words text-2xl font-bold text-[var(--ink)] [overflow-wrap:anywhere]">
-                        {{ project.name }}
-                    </h1>
+
+                    <div v-if="!isRenaming" class="mt-1 flex items-start gap-2">
+                        <h1 class="break-words text-2xl font-bold text-[var(--ink)] [overflow-wrap:anywhere]">
+                            {{ project.name }}
+                        </h1>
+                        <button
+                            v-if="can?.editProject"
+                            type="button"
+                            @click="startRename"
+                            class="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-transparent text-[var(--slate-soft)] transition hover:border-[var(--line)] hover:bg-[var(--panel-strong)] hover:text-[var(--ink)] focus-visible:opacity-100"
+                            aria-label="Rename project"
+                            title="Rename project"
+                        >
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div v-else class="mt-1 space-y-2">
+                        <input
+                            ref="renameInputEl"
+                            v-model="renameValue"
+                            @keydown.enter.prevent="saveRename"
+                            @keydown.esc.prevent="cancelRename"
+                            :disabled="isSavingRename"
+                            maxlength="255"
+                            class="app-input w-full text-2xl font-bold"
+                        />
+                        <div v-if="renameError" class="text-xs text-rose-600">{{ renameError }}</div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                type="button"
+                                @click="saveRename"
+                                :disabled="isSavingRename"
+                                class="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[var(--accent-deep)] disabled:opacity-50"
+                            >
+                                {{ isSavingRename ? 'Saving…' : 'Save' }}
+                            </button>
+                            <button
+                                type="button"
+                                @click="cancelRename"
+                                :disabled="isSavingRename"
+                                class="rounded-lg border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)] disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="app-panel-muted px-3 py-2 text-xs font-semibold text-[var(--slate-soft)]">

@@ -108,6 +108,7 @@ class ProjectController extends Controller
                 ->where('users.id', auth()->id())
                 ->wherePivot('role', 'office')
                 ->exists(),
+            'editProject' => Gate::allows('update', $project),
         ],
     ]);
     }
