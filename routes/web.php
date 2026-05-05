@@ -11,6 +11,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\MyTasksController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\InquiryController;
+use App\Http\Controllers\SearchController;
 use App\Models\Inquiry;
 use App\Models\Project;
 use App\Models\ProjectMessage;
@@ -177,6 +178,7 @@ Route::match(['get', 'post'], '/locale/{locale?}', function (Request $request, ?
 })->name('locale.set');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/search', [SearchController::class, 'index'])->name('search.index');
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');

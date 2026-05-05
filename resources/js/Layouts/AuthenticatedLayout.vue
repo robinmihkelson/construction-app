@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import FlashMessages from '@/Components/FlashMessages.vue'
 import ThemeToggle from '@/Components/ThemeToggle.vue';
 import UserAvatar from '@/Components/UserAvatar.vue';
+import GlobalSearch from '@/Components/GlobalSearch.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 
 const showingMobileMenu = ref(false);
@@ -60,7 +61,6 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
             class="fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-[var(--line)] bg-[var(--panel-bg)] transition-transform duration-200 ease-out lg:translate-x-0"
             :class="showingMobileMenu ? 'translate-x-0 shadow-2xl' : '-translate-x-full'"
         >
-            <!-- Logo -->
             <div class="flex h-14 shrink-0 items-center border-b border-[var(--line)] px-4">
                 <Link
                     :href="route('dashboard')"
@@ -187,16 +187,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                     <span class="text-base font-extrabold tracking-wide text-[var(--ink)]">PÄRLIKEE</span>
                 </Link>
 
-                <div class="relative hidden flex-1 sm:block" style="max-width: 22rem;">
-                    <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--slate-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
-                    </svg>
-                    <input
-                        type="search"
-                        placeholder="Search…"
-                        class="w-full rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] py-2 pl-9 pr-3 text-sm text-[var(--ink)] placeholder:text-[var(--slate-soft)] transition focus:border-[var(--accent)] focus:bg-[var(--panel-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/12"
-                    />
-                </div>
+                <GlobalSearch />
 
                 <div class="ml-auto flex items-center gap-1">
 
@@ -211,7 +202,6 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
 
                     <ThemeToggle />
 
-                    <!-- Back to website (mobile: icon only) -->
                     <Link
                         href="/"
                         aria-label="Back to website"
@@ -223,7 +213,6 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                         </svg>
                     </Link>
 
-                    <!-- Back to website (desktop: labeled) -->
                     <Link
                         href="/"
                         class="hidden items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)] md:inline-flex"
