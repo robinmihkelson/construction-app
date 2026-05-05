@@ -6,6 +6,7 @@ export default { layout: AuthenticatedLayout }
 <script setup>
 import { useForm, router, Link, usePage } from '@inertiajs/vue3'
 import { computed, nextTick, ref, onMounted, onBeforeUnmount } from 'vue'
+import UserAvatar from '@/Components/UserAvatar.vue'
 
 const page = usePage()
 const currentUser = computed(() => page.props.auth?.user ?? null)
@@ -368,9 +369,12 @@ function saveRename() {
                         >
                             <div class="flex items-center justify-between gap-2">
                                 <div class="flex min-w-0 items-center gap-2.5">
-                                    <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[0.6rem] font-bold text-[var(--accent)]">
-                                        {{ m.name?.slice(0,2).toUpperCase() }}
-                                    </div>
+                                    <UserAvatar
+                                        :url="m.avatar_url ?? null"
+                                        :name="m.name"
+                                        :seed="m.id"
+                                        :size="28"
+                                    />
                                     <div class="min-w-0">
                                         <div class="truncate text-xs font-semibold text-[var(--ink)]">{{ m.name }}</div>
                                         <div class="text-[0.64rem] font-semibold capitalize text-[var(--accent)]">

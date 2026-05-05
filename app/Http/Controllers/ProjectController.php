@@ -44,16 +44,16 @@ class ProjectController extends Controller
     $this->authorize('view', $project);
 
     $members = $project->users()
-        ->select('users.id','users.name')
+        ->select('users.id','users.name','users.avatar_path')
         ->withPivot('role')
         ->orderBy('users.name')
         ->get();
 
     $tasks = $project->tasks()
         ->with([
-            'assignee:id,name',
-            'comments' => fn ($query) => $query->with('user:id,name')->oldest(),
-            'progressImages' => fn ($query) => $query->with('user:id,name')->latest(),
+            'assignee:id,name,avatar_path',
+            'comments' => fn ($query) => $query->with('user:id,name,avatar_path')->oldest(),
+            'progressImages' => fn ($query) => $query->with('user:id,name,avatar_path')->latest(),
         ])
         ->latest()
         ->get();
@@ -73,6 +73,7 @@ class ProjectController extends Controller
                 'assignee' => $task->assignee ? [
                     'id' => $task->assignee->id,
                     'name' => $task->assignee->name,
+                    'avatar_url' => $task->assignee->avatar_url,
                 ] : null,
                 'comments' => $task->comments->map(fn ($comment) => [
                     'id' => $comment->id,
@@ -81,6 +82,7 @@ class ProjectController extends Controller
                     'user' => $comment->user ? [
                         'id' => $comment->user->id,
                         'name' => $comment->user->name,
+                        'avatar_url' => $comment->user->avatar_url,
                     ] : null,
                 ])->values(),
                 'progress_images' => $task->progressImages->map(fn ($image) => [
@@ -91,6 +93,7 @@ class ProjectController extends Controller
                     'user' => $image->user ? [
                         'id' => $image->user->id,
                         'name' => $image->user->name,
+                        'avatar_url' => $image->user->avatar_url,
                     ] : null,
                 ])->values(),
             ];

@@ -7,6 +7,7 @@ export default { layout: AuthenticatedLayout }
 import { nextTick, watch } from 'vue'
 import { onBeforeUnmount, onMounted, computed, ref } from 'vue'
 import { Link, useForm, router, usePage } from '@inertiajs/vue3'
+import UserAvatar from '@/Components/UserAvatar.vue'
 
 const currentUser = computed(() => usePage().props.auth?.user ?? null)
 
@@ -205,11 +206,14 @@ onBeforeUnmount(() => timer && clearInterval(timer))
                     :class="isMine(m) ? 'flex-row-reverse' : 'flex-row'"
                 >
                     <!-- Avatar -->
-                    <div class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[0.6rem] font-bold"
-                        :class="isMine(m) ? 'bg-[var(--accent)] text-white' : 'bg-[var(--panel-muted)] text-[var(--slate)]'"
-                    >
-                        {{ (m.user?.name ?? '?').charAt(0).toUpperCase() }}
-                    </div>
+                    <UserAvatar
+                        class="mt-0.5"
+                        :url="m.user?.avatar_url ?? null"
+                        :name="m.user?.name"
+                        :seed="m.user?.id"
+                        :size="28"
+                        :accent="isMine(m)"
+                    />
 
                     <!-- Bubble -->
                     <div class="max-w-[75%]" :class="isMine(m) ? 'items-end' : 'items-start'">

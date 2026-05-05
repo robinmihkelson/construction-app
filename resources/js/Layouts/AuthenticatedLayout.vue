@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import FlashMessages from '@/Components/FlashMessages.vue'
 import ThemeToggle from '@/Components/ThemeToggle.vue';
+import UserAvatar from '@/Components/UserAvatar.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 
 const showingMobileMenu = ref(false);
@@ -227,11 +228,18 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                     <div class="relative ml-1" ref="userMenuRef">
                         <button
                             @click="showUserMenu = !showUserMenu"
-                            class="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xs font-bold text-[var(--accent)] transition hover:ring-2 hover:ring-[var(--accent)]/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+                            class="rounded-full transition hover:ring-2 hover:ring-[var(--accent)]/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
                             :aria-expanded="showUserMenu"
                             aria-label="User menu"
                         >
-                            {{ userInitials }}
+                            <UserAvatar
+                                :url="authUser?.avatar_url ?? null"
+                                :name="authUserName"
+                                :email="authUser?.email"
+                                :seed="authUser?.id"
+                                :size="32"
+                                accent
+                            />
                         </button>
 
                         <Transition
@@ -249,9 +257,14 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
 
                                 <div class="border-b border-[var(--line)] px-4 py-3.5">
                                     <div class="flex items-center gap-2.5">
-                                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xs font-bold text-[var(--accent)]">
-                                            {{ userInitials }}
-                                        </div>
+                                        <UserAvatar
+                                            :url="authUser?.avatar_url ?? null"
+                                            :name="authUserName"
+                                            :email="authUser?.email"
+                                            :seed="authUser?.id"
+                                            :size="32"
+                                            accent
+                                        />
                                         <div class="min-w-0">
                                             <div class="truncate text-sm font-semibold text-[var(--ink)]">{{ authUserName }}</div>
                                             <div class="truncate text-xs text-[var(--slate-soft)]">{{ authUser?.email ?? '' }}</div>

@@ -3,6 +3,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
+import UpdateAvatarForm from './Partials/UpdateAvatarForm.vue';
+import UserAvatar from '@/Components/UserAvatar.vue';
 import { Head, usePage, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -12,13 +14,6 @@ defineProps({
 });
 
 const authUser = computed(() => usePage().props.auth?.user ?? null);
-
-const userInitials = computed(() => {
-    const name = authUser.value?.name?.trim() ?? authUser.value?.email?.split('@')[0] ?? 'U';
-    const parts = name.split(' ').filter(Boolean);
-    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    return name.slice(0, 2).toUpperCase();
-});
 </script>
 
 <template>
@@ -36,9 +31,14 @@ const userInitials = computed(() => {
 
             <!-- Avatar / identity hero -->
             <div class="app-panel flex items-center gap-5 p-5">
-                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xl font-bold text-[var(--accent)]">
-                    {{ userInitials }}
-                </div>
+                <UserAvatar
+                    :url="authUser?.avatar_url ?? null"
+                    :name="authUser?.name"
+                    :email="authUser?.email"
+                    :seed="authUser?.id"
+                    :size="64"
+                    accent
+                />
                 <div class="min-w-0">
                     <div class="text-base font-bold text-[var(--ink)]">{{ authUser?.name ?? authUser?.email }}</div>
                     <div class="mt-0.5 text-sm text-[var(--slate-soft)]">{{ authUser?.email }}</div>
@@ -49,6 +49,17 @@ const userInitials = computed(() => {
                     </svg>
                     Dashboard
                 </Link>
+            </div>
+
+            <!-- Profile picture -->
+            <div class="app-panel overflow-hidden">
+                <div class="border-b border-[var(--line)] px-6 py-4">
+                    <h2 class="text-sm font-bold text-[var(--ink)]">Profile picture</h2>
+                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">Upload a photo so teammates can recognize you in projects and chat.</p>
+                </div>
+                <div class="px-6 py-5">
+                    <UpdateAvatarForm />
+                </div>
             </div>
 
             <!-- Profile information -->

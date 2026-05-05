@@ -52,7 +52,7 @@ class ChatController extends Controller
     );
 
     $messages = $project->messages()
-        ->with(['user:id,name', 'attachments'])
+        ->with(['user:id,name,avatar_path', 'attachments'])
         ->orderByDesc('id')
         ->take(30)
         ->get()
@@ -132,7 +132,7 @@ class ChatController extends Controller
         $limit = $data['limit'] ?? 30;
 
         $q = $project->messages()
-            ->with(['user:id,name', 'attachments'])
+            ->with(['user:id,name,avatar_path', 'attachments'])
             ->orderByDesc('id');
 
         if (!empty($data['before_id'])) {
