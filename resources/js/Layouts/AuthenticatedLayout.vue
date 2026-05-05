@@ -68,7 +68,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                     @click="closeMobile"
                 >
                     <div>
-                        <div class="text-[0.8rem] font-extrabold tracking-wider text-[var(--ink)]">PÄRLIKEE</div>
+                        <div class="text-base font-extrabold tracking-wider text-[var(--ink)]">PÄRLIKEE</div>
                         <div class="text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[var(--slate-soft)]">Workspace</div>
                     </div>
                 </Link>
@@ -183,9 +183,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                     </svg>
                 </button>
 
-                <Link :href="route('dashboard')" class="flex items-center gap-2 lg:hidden">
-                    <div class="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--accent)] text-[0.6rem] font-black text-white">P</div>
-                    <span class="text-sm font-extrabold tracking-wide text-[var(--ink)]">PÄRLIKEE</span>
+                <Link :href="route('dashboard')" class="flex items-center lg:hidden">
+                    <span class="text-base font-extrabold tracking-wide text-[var(--ink)]">PÄRLIKEE</span>
                 </Link>
 
                 <div class="relative hidden flex-1 sm:block" style="max-width: 22rem;">
@@ -212,6 +211,19 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
 
                     <ThemeToggle />
 
+                    <!-- Back to website (mobile: icon only) -->
+                    <Link
+                        href="/"
+                        aria-label="Back to website"
+                        title="Back to website"
+                        class="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--slate-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] md:hidden"
+                    >
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </Link>
+
+                    <!-- Back to website (desktop: labeled) -->
                     <Link
                         href="/"
                         class="hidden items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)] md:inline-flex"
