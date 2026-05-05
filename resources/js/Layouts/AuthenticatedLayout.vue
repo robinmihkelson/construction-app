@@ -64,12 +64,9 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
             <div class="flex h-14 shrink-0 items-center border-b border-[var(--line)] px-4">
                 <Link
                     :href="route('dashboard')"
-                    class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition hover:bg-[var(--panel-strong)]"
+                    class="flex items-center rounded-lg px-2 py-1.5 transition hover:bg-[var(--panel-strong)]"
                     @click="closeMobile"
                 >
-                    <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)] text-[0.65rem] font-black text-white shadow-sm">
-                        P
-                    </div>
                     <div>
                         <div class="text-[0.8rem] font-extrabold tracking-wider text-[var(--ink)]">PÄRLIKEE</div>
                         <div class="text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[var(--slate-soft)]">Workspace</div>
