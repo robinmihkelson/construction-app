@@ -70,9 +70,9 @@ function setStatus(taskId, status) {
 }
 
 function statusBadgeClass(status) {
-    if (status === 'doing') return 'bg-amber-100 text-amber-800 ring-amber-200'
-    if (status === 'done')  return 'bg-emerald-100 text-emerald-800 ring-emerald-200'
-    return 'bg-slate-100 text-slate-700 ring-slate-200'
+    if (status === 'doing') return 'bg-amber-100 text-amber-800 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/30'
+    if (status === 'done')  return 'bg-emerald-100 text-emerald-800 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30'
+    return 'bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-500/15 dark:text-slate-200 dark:ring-slate-500/30'
 }
 
 function statusLabel(status) {
@@ -219,7 +219,6 @@ function saveRename() {
 <template>
     <div class="space-y-5">
 
-        <!-- Project header -->
         <div class="app-panel p-5">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div class="min-w-0 flex-1">
@@ -290,13 +289,12 @@ function saveRename() {
                 </div>
             </div>
 
-            <!-- Status counters -->
             <div class="mt-4 grid gap-2.5 sm:grid-cols-3">
                 <div
                     v-for="status in statusOptions"
                     :key="status"
                     class="flex items-center justify-between rounded-lg border border-[var(--line)] px-4 py-3"
-                    :class="status === 'done' ? 'bg-emerald-50 border-emerald-100' : status === 'doing' ? 'bg-amber-50 border-amber-100' : 'bg-[var(--panel-strong)]'"
+                    :class="status === 'done' ? 'bg-emerald-50 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/30' : status === 'doing' ? 'bg-amber-50 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/30' : 'bg-[var(--panel-strong)]'"
                 >
                     <span class="text-sm font-medium text-[var(--slate)]">{{ statusLabel(status) }}</span>
                     <span class="text-lg font-bold text-[var(--ink)]">{{ statusCounts[status] }}</span>
@@ -304,7 +302,6 @@ function saveRename() {
             </div>
         </div>
 
-        <!-- Syncing indicator -->
         <Transition
             enter-active-class="transition ease-out duration-200"
             enter-from-class="opacity-0 -translate-y-1"
@@ -322,13 +319,10 @@ function saveRename() {
             </div>
         </Transition>
 
-        <!-- Two-column layout: sidebar + main -->
         <div class="grid min-w-0 gap-5 xl:grid-cols-[300px_minmax(0,1fr)]">
 
-            <!-- ── Left sidebar ────────────────────────────────── -->
             <aside class="min-w-0 space-y-5 xl:sticky xl:top-20 xl:self-start">
 
-                <!-- Add task form -->
                 <div v-if="can.manageTasks" class="app-panel p-4">
                     <h2 class="app-section-title mb-0.5">Add task</h2>
                     <p class="mb-4 text-xs text-[var(--slate-soft)]">Create a work item, then track it inside.</p>
@@ -349,7 +343,6 @@ function saveRename() {
                     </form>
                 </div>
 
-                <!-- Team -->
                 <div class="app-panel p-4">
                     <div class="mb-3 flex items-center justify-between gap-3">
                         <div>
@@ -433,10 +426,8 @@ function saveRename() {
                 </div>
             </aside>
 
-            <!-- ── Main content ──────────────────────────────────── -->
             <div class="min-w-0 space-y-5">
 
-                <!-- Task list -->
                 <div class="app-panel overflow-hidden">
                     <div class="flex items-center justify-between gap-3 border-b border-[var(--line)] px-5 py-3.5">
                         <div>
@@ -465,7 +456,7 @@ function saveRename() {
                             @keydown.enter.prevent="openTask(t.id)"
                             @keydown.space.prevent="openTask(t.id)"
                             class="grid min-w-0 cursor-pointer gap-3 px-5 py-3.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)] hover:bg-[var(--panel-strong)] sm:grid-cols-[5rem_minmax(0,1fr)_auto] sm:items-center"
-                            :class="selectedTask?.id === t.id ? 'bg-blue-50/60' : ''"
+                            :class="selectedTask?.id === t.id ? 'bg-blue-50/60 dark:bg-blue-500/10' : ''"
                         >
                             <span
                                 class="w-fit rounded-full px-2.5 py-1 text-xs font-semibold ring-1"
@@ -491,9 +482,7 @@ function saveRename() {
                     </div>
                 </div>
 
-                <!-- Task detail -->
                 <div class="app-panel overflow-hidden">
-                    <!-- No task selected -->
                     <div v-if="!selectedTask" class="flex flex-col items-center gap-3 px-5 py-12 text-center">
                         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--panel-muted)]">
                             <svg class="h-5 w-5 text-[var(--slate-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -504,7 +493,6 @@ function saveRename() {
                     </div>
 
                     <div v-else>
-                        <!-- Task detail header -->
                         <div class="border-b border-[var(--line)] px-5 py-4">
                             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                 <div class="min-w-0">
@@ -538,7 +526,6 @@ function saveRename() {
                                 </span>
                             </div>
 
-                            <!-- Description -->
                             <div class="mt-4">
                                 <div class="mb-1.5 flex items-center justify-between">
                                     <div class="app-label">Description</div>
@@ -594,7 +581,6 @@ function saveRename() {
                                 </div>
                             </div>
 
-                            <!-- Status switcher -->
                             <div v-if="can.changeTaskStatus" class="mt-4">
                                 <div class="app-label mb-2">Change status</div>
                                 <div class="inline-flex flex-wrap rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] p-1 gap-0.5">
@@ -605,7 +591,7 @@ function saveRename() {
                                         @click.prevent.stop="setStatus(selectedTask.id, status)"
                                         class="rounded-md px-3 py-1.5 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
                                         :class="selectedTask.status === status
-                                            ? 'bg-white text-[var(--accent)] shadow-sm'
+                                            ? 'bg-[var(--panel-bg)] text-[var(--accent)] shadow-sm'
                                             : 'text-[var(--slate-soft)] hover:text-[var(--ink)]'"
                                     >
                                         {{ statusLabel(status) }}
@@ -614,10 +600,8 @@ function saveRename() {
                             </div>
                         </div>
 
-                        <!-- Progress photos + comments -->
                         <div class="grid gap-0 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
 
-                            <!-- Progress photos -->
                             <div class="border-b border-[var(--line)] px-5 py-4 lg:border-b-0 lg:border-r">
                                 <div class="mb-3 flex items-center justify-between gap-3">
                                     <h3 class="app-section-title">Progress photos</h3>
@@ -670,7 +654,6 @@ function saveRename() {
                                 </div>
                             </div>
 
-                            <!-- Task comments -->
                             <div class="px-5 py-4">
                                 <h3 class="app-section-title mb-3">Task comments</h3>
 

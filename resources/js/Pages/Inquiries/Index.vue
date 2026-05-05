@@ -11,15 +11,15 @@ const props = defineProps({
 const currentStatus = props.filters?.status ?? 'new'
 
 const tabs = [
-    { key: 'new',       label: 'New',       color: 'bg-blue-50 text-blue-700' },
-    { key: 'contacted', label: 'Contacted', color: 'bg-amber-50 text-amber-700' },
-    { key: 'converted', label: 'Converted', color: 'bg-emerald-50 text-emerald-700' },
+    { key: 'new',       label: 'New',       color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300' },
+    { key: 'contacted', label: 'Contacted', color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300' },
+    { key: 'converted', label: 'Converted', color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' },
 ]
 
 function statusBadge(status) {
-    if (status === 'new')       return 'bg-blue-50 text-blue-700 border border-blue-200'
-    if (status === 'contacted') return 'bg-amber-50 text-amber-700 border border-amber-200'
-    if (status === 'converted') return 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+    if (status === 'new')       return 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/30'
+    if (status === 'contacted') return 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/30'
+    if (status === 'converted') return 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/30'
     return 'bg-[var(--panel-muted)] text-[var(--slate)] border border-[var(--line)]'
 }
 
@@ -30,20 +30,18 @@ const totalCount = () => (props.counts?.new ?? 0) + (props.counts?.contacted ?? 
     <AuthenticatedLayout>
         <div class="space-y-6">
 
-            <!-- Page header -->
             <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <div class="app-label">Pipeline</div>
                     <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">Client inquiries</h1>
                     <p class="mt-1 text-sm text-[var(--slate-soft)]">Review new leads, mark them contacted, and convert them into projects.</p>
                 </div>
-                <div class="shrink-0 rounded-xl border border-[var(--line)] bg-white px-6 py-3 text-center shadow-sm">
+                <div class="shrink-0 rounded-xl border border-[var(--line)] bg-[var(--panel-bg)] px-6 py-3 text-center shadow-sm">
                     <div class="app-label">Total</div>
                     <div class="mt-0.5 text-3xl font-bold text-[var(--ink)]">{{ totalCount() }}</div>
                 </div>
             </div>
 
-            <!-- Status tabs -->
             <div class="flex flex-wrap gap-2">
                 <Link
                     v-for="tab in tabs"
@@ -52,7 +50,7 @@ const totalCount = () => (props.counts?.new ?? 0) + (props.counts?.contacted ?? 
                     class="flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition"
                     :class="tab.key === currentStatus
                         ? 'border-[var(--accent)] bg-[var(--accent)] text-white shadow-sm'
-                        : 'border-[var(--line)] bg-white text-[var(--slate-soft)] hover:border-[var(--line-strong)] hover:bg-[var(--panel-strong)] hover:text-[var(--ink)]'"
+                        : 'border-[var(--line)] bg-[var(--panel-bg)] text-[var(--slate-soft)] hover:border-[var(--line-strong)] hover:bg-[var(--panel-strong)] hover:text-[var(--ink)]'"
                 >
                     {{ tab.label }}
                     <span
@@ -66,10 +64,8 @@ const totalCount = () => (props.counts?.new ?? 0) + (props.counts?.contacted ?? 
                 </Link>
             </div>
 
-            <!-- Inquiry list -->
             <div class="app-panel overflow-hidden">
 
-                <!-- Empty state -->
                 <div v-if="!inquiries?.data?.length" class="flex flex-col items-center gap-4 px-6 py-16 text-center">
                     <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--panel-muted)]">
                         <svg class="h-6 w-6 text-[var(--slate-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -114,7 +110,6 @@ const totalCount = () => (props.counts?.new ?? 0) + (props.counts?.contacted ?? 
                     </div>
                 </div>
 
-                <!-- Pagination -->
                 <div v-if="inquiries?.prev_page_url || inquiries?.next_page_url" class="flex gap-2 border-t border-[var(--line)] px-5 py-3.5">
                     <Link
                         v-if="inquiries?.prev_page_url"

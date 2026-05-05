@@ -9,12 +9,12 @@ import { Link } from '@inertiajs/vue3'
 defineProps({ projects: Array })
 
 const avatarColors = [
-    'bg-blue-100 text-blue-700',
-    'bg-violet-100 text-violet-700',
-    'bg-emerald-100 text-emerald-700',
-    'bg-amber-100 text-amber-700',
-    'bg-rose-100 text-rose-700',
-    'bg-cyan-100 text-cyan-700',
+    'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
+    'bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300',
+    'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+    'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+    'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300',
+    'bg-cyan-100 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300',
 ]
 
 function avatarColor(id) {
@@ -36,7 +36,7 @@ function initial(name) {
                 <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">Chat channels</h1>
                 <p class="mt-1 text-sm text-[var(--slate-soft)]">Project threads, file sharing, and team updates in one place.</p>
             </div>
-            <div class="shrink-0 rounded-xl border border-[var(--line)] bg-white px-6 py-3 text-center shadow-sm">
+            <div class="shrink-0 rounded-xl border border-[var(--line)] bg-[var(--panel-bg)] px-6 py-3 text-center shadow-sm">
                 <div class="app-label">Channels</div>
                 <div class="mt-0.5 text-3xl font-bold text-[var(--ink)]">{{ projects?.length ?? 0 }}</div>
             </div>

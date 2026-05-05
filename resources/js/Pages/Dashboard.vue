@@ -117,47 +117,46 @@ function relativeTime(isoString) {
 
                         <div class="mt-4 space-y-2">
                             <!-- Projects -->
-                            <div class="flex items-center gap-3 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100">
-                                    <svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <div class="flex items-center gap-3 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 dark:border-blue-500/30 dark:bg-blue-500/10">
+                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/20">
+                                    <svg class="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
                                     </svg>
                                 </div>
                                 <div class="flex-1">
-                                    <div class="text-xs font-medium text-blue-700">Projects</div>
+                                    <div class="text-xs font-medium text-blue-700 dark:text-blue-300">Projects</div>
                                 </div>
-                                <div class="text-xl font-bold text-blue-700">{{ recentCounts.projects ?? 0 }}</div>
+                                <div class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ recentCounts.projects ?? 0 }}</div>
                             </div>
 
                             <!-- Chat -->
-                            <div class="flex items-center gap-3 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3">
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-100">
-                                    <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <div class="flex items-center gap-3 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 dark:border-emerald-500/30 dark:bg-emerald-500/10">
+                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/20">
+                                    <svg class="h-4 w-4 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                                     </svg>
                                 </div>
                                 <div class="flex-1">
-                                    <div class="text-xs font-medium text-emerald-700">Chat messages</div>
+                                    <div class="text-xs font-medium text-emerald-700 dark:text-emerald-300">Chat messages</div>
                                 </div>
-                                <div class="text-xl font-bold text-emerald-700">{{ recentCounts.chat ?? 0 }}</div>
+                                <div class="text-xl font-bold text-emerald-700 dark:text-emerald-300">{{ recentCounts.chat ?? 0 }}</div>
                             </div>
 
                             <!-- Inquiries -->
-                            <div class="flex items-center gap-3 rounded-lg border border-amber-100 bg-amber-50 px-4 py-3">
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100">
-                                    <svg class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <div class="flex items-center gap-3 rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 dark:border-amber-500/30 dark:bg-amber-500/10">
+                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-500/20">
+                                    <svg class="h-4 w-4 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                     </svg>
                                 </div>
                                 <div class="flex-1">
-                                    <div class="text-xs font-medium text-amber-700">Inquiries</div>
+                                    <div class="text-xs font-medium text-amber-700 dark:text-amber-300">Inquiries</div>
                                 </div>
-                                <div class="text-xl font-bold text-amber-700">{{ recentCounts.inquiries ?? 0 }}</div>
+                                <div class="text-xl font-bold text-amber-700 dark:text-amber-300">{{ recentCounts.inquiries ?? 0 }}</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Quick navigation -->
                     <div class="app-panel overflow-hidden">
                         <div class="border-b border-[var(--line)] px-5 py-3">
                             <div class="app-label">Quick access</div>

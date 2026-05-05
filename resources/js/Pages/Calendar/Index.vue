@@ -221,7 +221,7 @@ function onDrop(date, event) {
                 <div class="relative">
                     <select
                         v-model.number="selectedProjectIdModel"
-                        class="h-8 appearance-none rounded-lg border border-[var(--line)] bg-white py-0 pl-3 pr-8 text-xs font-medium text-[var(--slate)] transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/12"
+                        class="h-8 appearance-none rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] py-0 pl-3 pr-8 text-xs font-medium text-[var(--slate)] transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/12"
                         aria-label="Filter by project"
                     >
                         <option :value="0">All projects</option>
@@ -234,7 +234,7 @@ function onDrop(date, event) {
                 <button
                     type="button"
                     @click="prevMonth"
-                    class="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--line)] bg-white text-[var(--slate)] transition hover:bg-[var(--panel-muted)]"
+                    class="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] text-[var(--slate)] transition hover:bg-[var(--panel-muted)]"
                     aria-label="Previous month"
                 >
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -244,14 +244,14 @@ function onDrop(date, event) {
                 <button
                     type="button"
                     @click="goToday"
-                    class="rounded-lg border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)]"
+                    class="rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)]"
                 >
                     Today
                 </button>
                 <button
                     type="button"
                     @click="nextMonth"
-                    class="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--line)] bg-white text-[var(--slate)] transition hover:bg-[var(--panel-muted)]"
+                    class="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] text-[var(--slate)] transition hover:bg-[var(--panel-muted)]"
                     aria-label="Next month"
                 >
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -278,7 +278,7 @@ function onDrop(date, event) {
                     :key="i"
                     class="relative min-h-[7rem] border-b border-r border-[var(--line)] p-1.5 transition"
                     :class="[
-                        isCurrentMonth(date) ? 'bg-white' : 'bg-[var(--panel-strong)]/60',
+                        isCurrentMonth(date) ? 'bg-[var(--panel-bg)]' : 'bg-[var(--panel-strong)]/60',
                         isWeekend(date) && isCurrentMonth(date) ? 'bg-[var(--panel-strong)]' : '',
                         dragOverKey === ymd(date) ? 'ring-2 ring-inset ring-[var(--accent)] bg-[var(--accent-soft)]' : '',
                         (i + 1) % 7 === 0 ? 'border-r-0' : '',
@@ -308,7 +308,7 @@ function onDrop(date, event) {
                             :draggable="task.can_edit"
                             @dragstart="onDragStart(task, $event)"
                             @dragend="onDragEnd"
-                            class="group rounded-md border border-[var(--line)] bg-white px-2 py-1 text-[0.7rem] shadow-[var(--shadow-xs)] transition"
+                            class="group rounded-md border border-[var(--line)] bg-[var(--panel-bg)] px-2 py-1 text-[0.7rem] shadow-[var(--shadow-xs)] transition"
                             :class="[
                                 task.can_edit ? 'cursor-grab hover:border-[var(--accent)] hover:shadow-sm active:cursor-grabbing' : 'cursor-default opacity-90',
                                 draggingId === task.id ? 'opacity-50' : '',

@@ -45,9 +45,9 @@ function statusLabel(status) {
     return status
 }
 function statusBadge(status) {
-    if (status === 'doing') return 'bg-amber-100 text-amber-800 ring-amber-200'
-    if (status === 'done') return 'bg-emerald-100 text-emerald-800 ring-emerald-200'
-    return 'bg-slate-100 text-slate-700 ring-slate-200'
+    if (status === 'doing') return 'bg-amber-100 text-amber-800 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/30'
+    if (status === 'done') return 'bg-emerald-100 text-emerald-800 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30'
+    return 'bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-500/15 dark:text-slate-200 dark:ring-slate-500/30'
 }
 function statusDot(status) {
     if (status === 'doing') return 'bg-amber-500'
@@ -90,22 +90,21 @@ const filters = [
                 <p class="mt-1 text-sm text-[var(--slate-soft)]">Tasks assigned to you across all your projects.</p>
             </div>
             <div class="grid grid-cols-3 gap-2 text-center sm:flex sm:gap-3">
-                <div class="rounded-xl border border-[var(--line)] bg-white px-4 py-2 shadow-sm">
+                <div class="rounded-xl border border-[var(--line)] bg-[var(--panel-bg)] px-4 py-2 shadow-sm">
                     <div class="app-label">Open</div>
                     <div class="mt-0.5 text-xl font-bold text-[var(--ink)]">{{ counts.open }}</div>
                 </div>
-                <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 shadow-sm">
-                    <div class="text-[0.64rem] font-bold uppercase tracking-wider text-rose-700">Overdue</div>
-                    <div class="mt-0.5 text-xl font-bold text-rose-700">{{ counts.overdue }}</div>
+                <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 shadow-sm dark:border-rose-500/30 dark:bg-rose-500/10">
+                    <div class="text-[0.64rem] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-300">Overdue</div>
+                    <div class="mt-0.5 text-xl font-bold text-rose-700 dark:text-rose-300">{{ counts.overdue }}</div>
                 </div>
-                <div class="rounded-xl border border-[var(--line)] bg-white px-4 py-2 shadow-sm">
+                <div class="rounded-xl border border-[var(--line)] bg-[var(--panel-bg)] px-4 py-2 shadow-sm">
                     <div class="app-label">Done</div>
                     <div class="mt-0.5 text-xl font-bold text-[var(--ink)]">{{ counts.done }}</div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter pills -->
         <div class="inline-flex flex-wrap rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] p-1 gap-0.5">
             <button
                 v-for="f in filters"
@@ -114,7 +113,7 @@ const filters = [
                 @click="filter = f.key"
                 class="rounded-md px-3 py-1.5 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
                 :class="filter === f.key
-                    ? 'bg-white text-[var(--accent)] shadow-sm'
+                    ? 'bg-[var(--panel-bg)] text-[var(--accent)] shadow-sm'
                     : 'text-[var(--slate-soft)] hover:text-[var(--ink)]'"
             >
                 {{ f.label }}
@@ -122,7 +121,6 @@ const filters = [
             </button>
         </div>
 
-        <!-- Empty state -->
         <div v-if="visibleTasks.length === 0" class="app-panel flex flex-col items-center justify-center gap-3 py-16 text-center">
             <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--panel-muted)]">
                 <svg class="h-7 w-7 text-[var(--slate-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -137,7 +135,6 @@ const filters = [
             </div>
         </div>
 
-        <!-- Task list -->
         <div v-else class="app-panel divide-y divide-[var(--line)] overflow-hidden">
             <div
                 v-for="task in visibleTasks"
@@ -156,14 +153,14 @@ const filters = [
                             </span>
                             <span
                                 v-if="isOverdue(task)"
-                                class="rounded-full bg-rose-100 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-rose-700 ring-1 ring-rose-200"
+                                class="rounded-full bg-rose-100 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-rose-500/30"
                             >
                                 Overdue
                             </span>
                         </div>
                         <div class="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--slate-soft)]">
                             <span v-if="task.project" class="truncate">{{ task.project.name }}</span>
-                            <span v-if="task.due_date" :class="isOverdue(task) ? 'font-semibold text-rose-700' : ''">
+                            <span v-if="task.due_date" :class="isOverdue(task) ? 'font-semibold text-rose-700 dark:text-rose-300' : ''">
                                 Due {{ formatDue(task.due_date) }}
                             </span>
                             <span v-else class="italic">No due date</span>
@@ -183,7 +180,7 @@ const filters = [
                             @click="setStatus(task, status)"
                             class="rounded-md px-2 py-1 text-[0.65rem] font-semibold transition"
                             :class="task.status === status
-                                ? 'bg-white text-[var(--accent)] shadow-sm'
+                                ? 'bg-[var(--panel-bg)] text-[var(--accent)] shadow-sm'
                                 : 'text-[var(--slate-soft)] hover:text-[var(--ink)]'"
                         >
                             {{ statusLabel(status) }}

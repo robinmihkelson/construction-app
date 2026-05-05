@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import FlashMessages from '@/Components/FlashMessages.vue'
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 
 const showingMobileMenu = ref(false);
@@ -39,7 +40,6 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
 <template>
     <div class="min-h-screen bg-[var(--site-bg)]">
 
-        <!-- Mobile sidebar backdrop -->
         <Transition
             enter-active-class="transition ease-out duration-150"
             enter-from-class="opacity-0"
@@ -55,9 +55,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
             />
         </Transition>
 
-        <!-- ── Sidebar ──────────────────────────────────────── -->
         <aside
-            class="fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-[var(--line)] bg-white transition-transform duration-200 ease-out lg:translate-x-0"
+            class="fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-[var(--line)] bg-[var(--panel-bg)] transition-transform duration-200 ease-out lg:translate-x-0"
             :class="showingMobileMenu ? 'translate-x-0 shadow-2xl' : '-translate-x-full'"
         >
             <!-- Logo -->
@@ -77,7 +76,6 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                 </Link>
             </div>
 
-            <!-- Navigation -->
             <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-3">
 
                 <Link
@@ -171,16 +169,12 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                 </Link>
 
             </nav>
-            <!-- No footer — profile/logout live in the top header avatar dropdown -->
         </aside>
 
-        <!-- ── Main area ────────────────────────────────────── -->
         <div class="flex min-h-screen flex-col lg:pl-60">
 
-            <!-- Top header bar -->
-            <header class="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b border-[var(--line)] bg-white px-4">
+            <header class="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b border-[var(--line)] bg-[var(--panel-bg)] px-4">
 
-                <!-- Hamburger (mobile) -->
                 <button
                     @click="showingMobileMenu = !showingMobileMenu"
                     class="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--slate-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] lg:hidden"
@@ -191,13 +185,11 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                     </svg>
                 </button>
 
-                <!-- Mobile brand -->
                 <Link :href="route('dashboard')" class="flex items-center gap-2 lg:hidden">
                     <div class="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--accent)] text-[0.6rem] font-black text-white">P</div>
                     <span class="text-sm font-extrabold tracking-wide text-[var(--ink)]">PÄRLIKEE</span>
                 </Link>
 
-                <!-- Global search -->
                 <div class="relative hidden flex-1 sm:block" style="max-width: 22rem;">
                     <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--slate-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
@@ -205,14 +197,12 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                     <input
                         type="search"
                         placeholder="Search…"
-                        class="w-full rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] py-2 pl-9 pr-3 text-sm text-[var(--ink)] placeholder:text-[var(--slate-soft)] transition focus:border-[var(--accent)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/12"
+                        class="w-full rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] py-2 pl-9 pr-3 text-sm text-[var(--ink)] placeholder:text-[var(--slate-soft)] transition focus:border-[var(--accent)] focus:bg-[var(--panel-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/12"
                     />
                 </div>
 
-                <!-- Right side -->
                 <div class="ml-auto flex items-center gap-1">
 
-                    <!-- Notifications bell -->
                     <button
                         class="relative flex h-9 w-9 items-center justify-center rounded-lg text-[var(--slate-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
                         aria-label="Notifications"
@@ -222,10 +212,11 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                         </svg>
                     </button>
 
-                    <!-- Back to website -->
+                    <ThemeToggle />
+
                     <Link
                         href="/"
-                        class="hidden items-center gap-1.5 rounded-lg border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)] md:inline-flex"
+                        class="hidden items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)] md:inline-flex"
                     >
                         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -233,7 +224,6 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                         Website
                     </Link>
 
-                    <!-- ── User avatar + dropdown ──────────────── -->
                     <div class="relative ml-1" ref="userMenuRef">
                         <button
                             @click="showUserMenu = !showUserMenu"
@@ -244,7 +234,6 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                             {{ userInitials }}
                         </button>
 
-                        <!-- Dropdown panel -->
                         <Transition
                             enter-active-class="transition ease-out duration-100"
                             enter-from-class="opacity-0 scale-95 -translate-y-1"
@@ -255,9 +244,9 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                         >
                             <div
                                 v-if="showUserMenu"
-                                class="absolute right-0 top-full z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-xl border border-[var(--line)] bg-white shadow-[var(--shadow-md)]"
+                                class="absolute right-0 top-full z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--panel-bg)] shadow-[var(--shadow-md)]"
                             >
-                                <!-- User info -->
+
                                 <div class="border-b border-[var(--line)] px-4 py-3.5">
                                     <div class="flex items-center gap-2.5">
                                         <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xs font-bold text-[var(--accent)]">
@@ -270,7 +259,6 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                                     </div>
                                 </div>
 
-                                <!-- Menu items -->
                                 <div class="p-1.5 space-y-0.5">
                                     <Link
                                         :href="route('profile.edit')"
@@ -289,7 +277,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                                             :href="route('logout')"
                                             method="post"
                                             as="button"
-                                            class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-rose-600 transition hover:bg-rose-50 hover:text-rose-700"
+                                            class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-rose-600 transition hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-500/10 dark:hover:text-rose-300"
                                             @click="showUserMenu = false"
                                         >
                                             <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -306,12 +294,10 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, 
                 </div>
             </header>
 
-            <!-- Optional page sub-header -->
-            <div v-if="$slots.header" class="shrink-0 border-b border-[var(--line)] bg-white px-4 py-4 sm:px-6">
+            <div v-if="$slots.header" class="shrink-0 border-b border-[var(--line)] bg-[var(--panel-bg)] px-4 py-4 sm:px-6">
                 <slot name="header" />
             </div>
 
-            <!-- Page content -->
             <main class="flex-1">
                 <div class="px-4 py-6 sm:px-6">
                     <FlashMessages />
