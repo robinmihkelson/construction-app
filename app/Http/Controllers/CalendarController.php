@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class CalendarController extends Controller
@@ -34,6 +35,7 @@ class CalendarController extends Controller
             ->map(fn (Task $task) => [
                 'id' => $task->id,
                 'title' => $task->title,
+                'description' => $task->description ? Str::limit($task->description, 240) : null,
                 'status' => $task->status,
                 'due_date' => Carbon::parse($task->due_date)->toDateString(),
                 'project' => $task->project ? [

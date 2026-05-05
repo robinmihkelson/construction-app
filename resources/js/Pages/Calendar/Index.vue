@@ -6,6 +6,7 @@ export default { layout: AuthenticatedLayout }
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
+import Modal from '@/Components/Modal.vue'
 
 const props = defineProps({
     tasks: { type: Array, default: () => [] },
@@ -31,6 +32,7 @@ const draggingId = ref(null)
 const dragOverKey = ref(null)
 const savingIds = ref(new Set())
 const selectedProjectId = ref(loadSavedProjectId())
+const previewTask = ref(null)
 
 watch(selectedProjectId, (val) => {
     try {
@@ -134,14 +136,24 @@ function goToday() {
 }
 
 function statusBadge(status) {
-    if (status === 'doing') return 'bg-amber-100 text-amber-800 ring-amber-200'
-    if (status === 'done') return 'bg-emerald-100 text-emerald-800 ring-emerald-200'
-    return 'bg-slate-100 text-slate-700 ring-slate-200'
+    if (status === 'doing') return 'bg-amber-100 text-amber-800 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/30'
+    if (status === 'done') return 'bg-emerald-100 text-emerald-800 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30'
+    return 'bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-500/15 dark:text-slate-200 dark:ring-slate-500/30'
 }
 function statusDot(status) {
     if (status === 'doing') return 'bg-amber-500'
     if (status === 'done') return 'bg-emerald-500'
     return 'bg-slate-400'
+}
+function statusLabel(status) {
+    if (status === 'doing') return 'Doing'
+    if (status === 'done') return 'Done'
+    return 'To do'
+}
+function formatDueLong(date) {
+    if (!date) return '—'
+    const d = new Date(String(date).slice(0, 10))
+    return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 }
 
 function onDragStart(task, event) {
@@ -315,10 +327,10 @@ function onDrop(date, event) {
                                 savingIds.has(task.id) ? 'animate-pulse' : '',
                             ]"
                         >
-                            <Link
-                                :href="task.project ? route('projects.show', task.project.id) + '?task=' + task.id : '#'"
-                                :draggable="false"
-                                class="block"
+                            <button
+                                type="button"
+                                @click="previewTask = task"
+                                class="block w-full text-left"
                             >
                                 <div class="flex items-center gap-1.5">
                                     <span class="h-1.5 w-1.5 shrink-0 rounded-full" :class="statusDot(task.status)" />
@@ -330,7 +342,7 @@ function onDrop(date, event) {
                                 >
                                     {{ task.project.name }}
                                 </div>
-                            </Link>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -348,5 +360,77 @@ function onDrop(date, event) {
                 <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Done
             </span>
         </div>
+
+        <Modal :show="!!previewTask" max-width="md" @close="previewTask = null">
+            <div v-if="previewTask" class="p-5">
+                <div class="flex items-start justify-between gap-3">
+                    <span
+                        class="rounded-full px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wide ring-1"
+                        :class="statusBadge(previewTask.status)"
+                    >
+                        {{ statusLabel(previewTask.status) }}
+                    </span>
+                    <button
+                        type="button"
+                        @click="previewTask = null"
+                        aria-label="Close"
+                        class="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--slate-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--ink)]"
+                    >
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6" />
+                        </svg>
+                    </button>
+                </div>
+
+                <h3 class="mt-3 break-words text-lg font-bold text-[var(--ink)] [overflow-wrap:anywhere]">
+                    {{ previewTask.title }}
+                </h3>
+
+                <dl class="mt-4 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2 text-sm">
+                    <dt class="text-[var(--slate-soft)]">Project</dt>
+                    <dd class="font-medium text-[var(--ink)]">{{ previewTask.project?.name ?? '—' }}</dd>
+
+                    <dt class="text-[var(--slate-soft)]">Due</dt>
+                    <dd class="font-medium text-[var(--ink)]">{{ formatDueLong(previewTask.due_date) }}</dd>
+
+                    <dt class="text-[var(--slate-soft)]">Assignee</dt>
+                    <dd class="font-medium text-[var(--ink)]">{{ previewTask.assignee?.name ?? 'Unassigned' }}</dd>
+                </dl>
+
+                <div class="mt-4">
+                    <div class="app-label mb-1.5">Description</div>
+                    <p
+                        v-if="previewTask.description"
+                        class="whitespace-pre-wrap break-words rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2 text-sm text-[var(--slate)] [overflow-wrap:anywhere]"
+                    >
+                        {{ previewTask.description }}
+                    </p>
+                    <p v-else class="rounded-lg border border-dashed border-[var(--line)] px-3 py-2 text-xs italic text-[var(--slate-soft)]">
+                        No description.
+                    </p>
+                </div>
+
+                <div class="mt-5 flex flex-wrap gap-2">
+                    <Link
+                        v-if="previewTask.project"
+                        :href="route('projects.show', previewTask.project.id) + '?task=' + previewTask.id"
+                        @click="previewTask = null"
+                        class="app-button-primary gap-1.5"
+                    >
+                        Open in project
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </Link>
+                    <button
+                        type="button"
+                        @click="previewTask = null"
+                        class="app-button-secondary"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        </Modal>
     </div>
 </template>
