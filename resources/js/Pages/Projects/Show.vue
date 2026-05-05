@@ -333,7 +333,7 @@ function saveRename() {
 
         <div class="grid min-w-0 gap-5 xl:grid-cols-[300px_minmax(0,1fr)]">
 
-            <aside class="min-w-0 space-y-5 xl:sticky xl:top-20 xl:self-start">
+            <aside class="order-2 min-w-0 space-y-5 xl:order-none xl:sticky xl:top-20 xl:self-start">
 
                 <div v-if="can.manageTasks" class="app-panel p-4">
                     <h2 class="app-section-title mb-0.5">Add task</h2>
@@ -441,7 +441,7 @@ function saveRename() {
                 </div>
             </aside>
 
-            <div class="min-w-0 space-y-5">
+            <div class="order-1 min-w-0 space-y-5 xl:order-none">
 
                 <div class="app-panel overflow-hidden">
                     <div class="flex items-center justify-between gap-3 border-b border-[var(--line)] px-5 py-3.5">
