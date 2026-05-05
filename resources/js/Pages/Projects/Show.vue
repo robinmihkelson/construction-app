@@ -29,7 +29,7 @@ const taskCommentForm = useForm({ body: '' })
 const progressImageForm = useForm({ images: [] })
 
 const isBusy = ref(false)
-const selectedTaskId = ref(props.tasks[0]?.id ?? null)
+const selectedTaskId = ref(null)
 const selectedTask = computed(() => props.tasks.find((t) => t.id === selectedTaskId.value) ?? null)
 const statusOptions = ['todo', 'doing', 'done']
 const statusCounts = computed(() => ({
@@ -91,6 +91,17 @@ function openTask(taskId) {
     descriptionError.value = ''
     const url = new URL(window.location.href)
     url.searchParams.set('task', taskId)
+    window.history.replaceState({}, '', url)
+}
+
+function closeTask() {
+    selectedTaskId.value = null
+    taskCommentForm.reset('body')
+    progressImageForm.reset('images')
+    isEditingDescription.value = false
+    descriptionError.value = ''
+    const url = new URL(window.location.href)
+    url.searchParams.delete('task')
     window.history.replaceState({}, '', url)
 }
 
@@ -510,14 +521,27 @@ function saveRename() {
                                         {{ selectedTask.title }}
                                     </h2>
                                 </div>
-                                <button
-                                    v-if="can.manageTasks"
-                                    type="button"
-                                    @click.prevent.stop="deleteTask(selectedTask.id)"
-                                    class="app-button-danger shrink-0 w-fit"
-                                >
-                                    Delete task
-                                </button>
+                                <div class="flex shrink-0 items-center gap-2">
+                                    <button
+                                        v-if="can.manageTasks"
+                                        type="button"
+                                        @click.prevent.stop="deleteTask(selectedTask.id)"
+                                        class="app-button-danger w-fit"
+                                    >
+                                        Delete task
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click.prevent.stop="closeTask"
+                                        aria-label="Close task"
+                                        title="Close task"
+                                        class="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--slate-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+                                    >
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Meta -->
