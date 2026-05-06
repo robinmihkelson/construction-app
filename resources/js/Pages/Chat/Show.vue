@@ -221,7 +221,7 @@ onBeforeUnmount(() => timer && clearInterval(timer))
                             class="rounded-2xl px-4 py-2.5 text-sm"
                             :class="isMine(m)
                                 ? 'rounded-tr-sm bg-[var(--accent)] text-white'
-                                : 'rounded-tl-sm border border-[var(--line)] bg-white text-[var(--ink)]'"
+                                : 'rounded-tl-sm border border-[var(--line)] bg-[var(--panel-strong)] text-[var(--ink)]'"
                         >
                             <!-- Sender name (others only) -->
                             <div v-if="!isMine(m)" class="mb-1 text-[0.65rem] font-bold text-[var(--accent)]">

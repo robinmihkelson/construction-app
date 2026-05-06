@@ -97,10 +97,10 @@ const authUser = computed(() => usePage().props.auth?.user ?? null);
             </div>
 
             <!-- Danger zone -->
-            <div class="overflow-hidden rounded-xl border border-rose-200 bg-white">
-                <div class="border-b border-rose-100 bg-rose-50/60 px-6 py-4">
-                    <h2 class="text-sm font-bold text-rose-800">Danger zone</h2>
-                    <p class="mt-0.5 text-xs text-rose-600">Irreversible actions — please proceed carefully.</p>
+            <div class="overflow-hidden rounded-xl border border-rose-200 bg-white dark:border-rose-900/60 dark:bg-[var(--panel-bg)]">
+                <div class="border-b border-rose-100 bg-rose-50/60 px-6 py-4 dark:border-rose-900/40 dark:bg-rose-950/30">
+                    <h2 class="text-sm font-bold text-rose-800 dark:text-rose-300">Danger zone</h2>
+                    <p class="mt-0.5 text-xs text-rose-600 dark:text-rose-400">Irreversible actions — please proceed carefully.</p>
                 </div>
                 <div class="px-6 py-5">
                     <DeleteUserForm />

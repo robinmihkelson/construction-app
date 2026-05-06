@@ -52,7 +52,14 @@ onMounted(async () => {
 
 async function enable() {
     error.value = '';
-    if (!supported.value || !vapidPublicKey.value) return;
+    if (!supported.value) {
+        error.value = 'This browser does not support push notifications.';
+        return;
+    }
+    if (!vapidPublicKey.value) {
+        error.value = 'Notifications are not configured on the server (missing VAPID key).';
+        return;
+    }
 
     busy.value = true;
     try {
