@@ -4,6 +4,7 @@ import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 import UpdateAvatarForm from './Partials/UpdateAvatarForm.vue';
+import PushNotificationsForm from './Partials/PushNotificationsForm.vue';
 import UserAvatar from '@/Components/UserAvatar.vue';
 import { Head, usePage, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -81,6 +82,17 @@ const authUser = computed(() => usePage().props.auth?.user ?? null);
                 </div>
                 <div class="px-6 py-5">
                     <UpdatePasswordForm />
+                </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="app-panel overflow-hidden">
+                <div class="border-b border-[var(--line)] px-6 py-4">
+                    <h2 class="text-sm font-bold text-[var(--ink)]">Notifications</h2>
+                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">Push notifications for new chat messages on this device.</p>
+                </div>
+                <div class="px-6 py-5">
+                    <PushNotificationsForm />
                 </div>
             </div>
 

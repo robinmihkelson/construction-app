@@ -10,7 +10,9 @@ use App\Models\ProjectMessageRead;
 use App\Models\ProjectMessageAttachment;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use App\Notifications\NewProjectMessage;
 
 class ChatController extends Controller
 {
@@ -100,6 +102,14 @@ class ChatController extends Controller
                 'size' => $file->getSize(),
             ]);
         }
+    }
+
+    $recipients = $project->users()
+        ->where('users.id', '!=', $request->user()->id)
+        ->get();
+
+    if ($recipients->isNotEmpty()) {
+        Notification::send($recipients, new NewProjectMessage($message));
     }
 
     return back()->with('success', 'Message sent.');
