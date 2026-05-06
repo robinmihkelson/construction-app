@@ -4,7 +4,7 @@ import FlashMessages from '@/Components/FlashMessages.vue'
 import ThemeToggle from '@/Components/ThemeToggle.vue';
 import UserAvatar from '@/Components/UserAvatar.vue';
 import GlobalSearch from '@/Components/GlobalSearch.vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 
 const showingMobileMenu = ref(false);
 const showUserMenu = ref(false);
@@ -37,9 +37,25 @@ function handleClickOutside(e) {
 }
 onMounted(() => document.addEventListener('click', handleClickOutside, true))
 onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside, true))
+
+onMounted(() => {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+});
 </script>
 
 <template>
+    <Head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#2563eb" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Pärlikee" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    </Head>
+
     <div class="min-h-screen bg-[var(--site-bg)]">
 
         <Transition
