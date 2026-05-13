@@ -1,7 +1,9 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { useT } from '@/i18n/useT';
 
+const { t } = useT();
 const vapidPublicKey = computed(() => usePage().props.vapidPublicKey ?? null);
 
 const supported = ref(false);
@@ -53,11 +55,11 @@ onMounted(async () => {
 async function enable() {
     error.value = '';
     if (!supported.value) {
-        error.value = 'This browser does not support push notifications.';
+        error.value = t('push.unsupported');
         return;
     }
     if (!vapidPublicKey.value) {
-        error.value = 'Notifications are not configured on the server (missing VAPID key).';
+        error.value = t('push.err_vapid');
         return;
     }
 
@@ -67,7 +69,7 @@ async function enable() {
         const result = await Notification.requestPermission();
         permission.value = result;
         if (result !== 'granted') {
-            error.value = 'Permission was not granted.';
+            error.value = t('push.err_permission');
             return;
         }
 
@@ -96,7 +98,7 @@ async function enable() {
 
         subscribed.value = true;
     } catch (e) {
-        error.value = e.message || 'Failed to enable notifications.';
+        error.value = e.message || t('push.err_enable');
     } finally {
         busy.value = false;
     }
@@ -125,7 +127,7 @@ async function disable() {
         }
         subscribed.value = false;
     } catch (e) {
-        error.value = e.message || 'Failed to disable notifications.';
+        error.value = e.message || t('push.err_disable');
     } finally {
         busy.value = false;
     }
@@ -136,21 +138,18 @@ const iosNeedsInstall = computed(() => isIosSafari.value && !isStandalone.value)
 
 <template>
     <div class="space-y-3">
-        <p class="text-sm text-[var(--slate-soft)]">
-            Get a push notification when teammates send a chat message in one of your projects.
-        </p>
+        <p class="text-sm text-[var(--slate-soft)]">{{ t('push.desc') }}</p>
 
         <div v-if="!supported" class="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
-            Your browser doesn't support web push notifications.
+            {{ t('push.unsupported') }}
         </div>
 
         <div v-else-if="iosNeedsInstall" class="rounded-md bg-blue-50 px-3 py-2 text-xs text-blue-800">
-            On iPhone, add Pärlikee to your home screen first (Share → Add to Home Screen),
-            then open it from there to enable notifications.
+            {{ t('push.ios_install') }}
         </div>
 
         <div v-else-if="permission === 'denied'" class="rounded-md bg-rose-50 px-3 py-2 text-xs text-rose-700">
-            Notifications are blocked at the browser level. Enable them in your browser settings, then return here.
+            {{ t('push.denied') }}
         </div>
 
         <div v-else class="flex flex-wrap items-center gap-2">
@@ -161,7 +160,7 @@ const iosNeedsInstall = computed(() => isIosSafari.value && !isStandalone.value)
                 :disabled="busy"
                 @click="enable"
             >
-                {{ busy ? 'Working…' : 'Enable notifications' }}
+                {{ busy ? t('push.busy') : t('push.enable') }}
             </button>
             <button
                 v-else
@@ -170,9 +169,9 @@ const iosNeedsInstall = computed(() => isIosSafari.value && !isStandalone.value)
                 :disabled="busy"
                 @click="disable"
             >
-                {{ busy ? 'Working…' : 'Disable notifications' }}
+                {{ busy ? t('push.busy') : t('push.disable') }}
             </button>
-            <span v-if="subscribed" class="text-xs text-emerald-700">Notifications are on for this device.</span>
+            <span v-if="subscribed" class="text-xs text-emerald-700">{{ t('push.on') }}</span>
         </div>
 
         <p v-if="error" class="text-xs text-rose-600">{{ error }}</p>

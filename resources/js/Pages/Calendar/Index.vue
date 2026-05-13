@@ -7,6 +7,9 @@ export default { layout: AuthenticatedLayout }
 import { computed, ref, watch } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import Modal from '@/Components/Modal.vue'
+import { useT } from '@/i18n/useT'
+
+const { t, locale } = useT()
 
 const props = defineProps({
     tasks: { type: Array, default: () => [] },
@@ -59,10 +62,19 @@ watch(
     { deep: true }
 )
 
-const weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const intlLocale = computed(() => locale.value === 'fi' ? 'fi-FI' : locale.value === 'en' ? 'en-US' : 'et-EE')
+
+const weekdayLabels = computed(() => {
+    const base = new Date(2024, 0, 1) // Monday
+    return Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(base)
+        d.setDate(base.getDate() + i)
+        return d.toLocaleDateString(intlLocale.value, { weekday: 'short' })
+    })
+})
 
 const monthLabel = computed(() =>
-    cursor.value.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    cursor.value.toLocaleDateString(intlLocale.value, { month: 'long', year: 'numeric' })
 )
 
 const days = computed(() => {
@@ -146,14 +158,14 @@ function statusDot(status) {
     return 'bg-slate-400'
 }
 function statusLabel(status) {
-    if (status === 'doing') return 'Doing'
-    if (status === 'done') return 'Done'
-    return 'To do'
+    if (status === 'doing') return t('status.doing')
+    if (status === 'done') return t('status.done')
+    return t('status.todo')
 }
 function formatDueLong(date) {
     if (!date) return '—'
     const d = new Date(String(date).slice(0, 10))
-    return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    return d.toLocaleDateString(intlLocale.value, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 }
 
 function onDragStart(task, event) {
@@ -218,14 +230,14 @@ function onDrop(date, event) {
 </script>
 
 <template>
-    <Head title="Calendar" />
+    <Head :title="t('nav.calendar')" />
 
     <div class="space-y-4">
         <div class="app-panel flex flex-wrap items-center gap-3 px-4 py-3">
             <div>
                 <h1 class="text-lg font-bold text-[var(--ink)]">{{ monthLabel }}</h1>
                 <p class="text-xs text-[var(--slate-soft)]">
-                    {{ monthCount }} task{{ monthCount === 1 ? '' : 's' }} due this month
+                    {{ monthCount }}
                 </p>
             </div>
 
@@ -234,9 +246,9 @@ function onDrop(date, event) {
                     <select
                         v-model.number="selectedProjectIdModel"
                         class="h-8 appearance-none rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] py-0 pl-3 pr-8 text-xs font-medium text-[var(--slate)] transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/12"
-                        aria-label="Filter by project"
+                        :aria-label="t('calendar.all_projects')"
                     >
-                        <option :value="0">All projects</option>
+                        <option :value="0">{{ t('calendar.all_projects') }}</option>
                         <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
                 </div>
@@ -247,7 +259,7 @@ function onDrop(date, event) {
                     type="button"
                     @click="prevMonth"
                     class="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] text-[var(--slate)] transition hover:bg-[var(--panel-muted)]"
-                    aria-label="Previous month"
+                    :aria-label="t('calendar.previous_month')"
                 >
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -258,13 +270,13 @@ function onDrop(date, event) {
                     @click="goToday"
                     class="rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)]"
                 >
-                    Today
+                    {{ t('calendar.today') }}
                 </button>
                 <button
                     type="button"
                     @click="nextMonth"
                     class="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--panel-bg)] text-[var(--slate)] transition hover:bg-[var(--panel-muted)]"
-                    aria-label="Next month"
+                    :aria-label="t('calendar.next_month')"
                 >
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -351,13 +363,13 @@ function onDrop(date, event) {
 
         <div class="flex flex-wrap items-center gap-3 px-1 text-xs text-[var(--slate-soft)]">
             <span class="inline-flex items-center gap-1.5">
-                <span class="h-1.5 w-1.5 rounded-full bg-slate-400" /> To do
+                <span class="h-1.5 w-1.5 rounded-full bg-slate-400" /> {{ t('status.todo') }}
             </span>
             <span class="inline-flex items-center gap-1.5">
-                <span class="h-1.5 w-1.5 rounded-full bg-amber-500" /> Doing
+                <span class="h-1.5 w-1.5 rounded-full bg-amber-500" /> {{ t('status.doing') }}
             </span>
             <span class="inline-flex items-center gap-1.5">
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Done
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" /> {{ t('status.done') }}
             </span>
         </div>
 
@@ -373,7 +385,7 @@ function onDrop(date, event) {
                     <button
                         type="button"
                         @click="previewTask = null"
-                        aria-label="Close"
+                        :aria-label="t('common.close')"
                         class="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--slate-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--ink)]"
                     >
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -387,18 +399,18 @@ function onDrop(date, event) {
                 </h3>
 
                 <dl class="mt-4 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2 text-sm">
-                    <dt class="text-[var(--slate-soft)]">Project</dt>
+                    <dt class="text-[var(--slate-soft)]">{{ t('calendar.project') }}</dt>
                     <dd class="font-medium text-[var(--ink)]">{{ previewTask.project?.name ?? '—' }}</dd>
 
-                    <dt class="text-[var(--slate-soft)]">Due</dt>
+                    <dt class="text-[var(--slate-soft)]">{{ t('calendar.due') }}</dt>
                     <dd class="font-medium text-[var(--ink)]">{{ formatDueLong(previewTask.due_date) }}</dd>
 
-                    <dt class="text-[var(--slate-soft)]">Assignee</dt>
-                    <dd class="font-medium text-[var(--ink)]">{{ previewTask.assignee?.name ?? 'Unassigned' }}</dd>
+                    <dt class="text-[var(--slate-soft)]">{{ t('calendar.assignee') }}</dt>
+                    <dd class="font-medium text-[var(--ink)]">{{ previewTask.assignee?.name ?? t('common.unassigned') }}</dd>
                 </dl>
 
                 <div class="mt-4">
-                    <div class="app-label mb-1.5">Description</div>
+                    <div class="app-label mb-1.5">{{ t('calendar.description') }}</div>
                     <p
                         v-if="previewTask.description"
                         class="whitespace-pre-wrap break-words rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2 text-sm text-[var(--slate)] [overflow-wrap:anywhere]"
@@ -406,7 +418,7 @@ function onDrop(date, event) {
                         {{ previewTask.description }}
                     </p>
                     <p v-else class="rounded-lg border border-dashed border-[var(--line)] px-3 py-2 text-xs italic text-[var(--slate-soft)]">
-                        No description.
+                        {{ t('calendar.no_description') }}
                     </p>
                 </div>
 
@@ -417,7 +429,7 @@ function onDrop(date, event) {
                         @click="previewTask = null"
                         class="app-button-primary gap-1.5"
                     >
-                        Open in project
+                        {{ t('calendar.open_in_project') }}
                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                         </svg>
@@ -427,7 +439,7 @@ function onDrop(date, event) {
                         @click="previewTask = null"
                         class="app-button-secondary"
                     >
-                        Close
+                        {{ t('common.close') }}
                     </button>
                 </div>
             </div>

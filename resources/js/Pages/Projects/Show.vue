@@ -7,6 +7,9 @@ export default { layout: AuthenticatedLayout }
 import { useForm, router, Link, usePage } from '@inertiajs/vue3'
 import { computed, nextTick, ref, onMounted, onBeforeUnmount } from 'vue'
 import UserAvatar from '@/Components/UserAvatar.vue'
+import { useT } from '@/i18n/useT'
+
+const { t } = useT()
 
 const page = usePage()
 const currentUser = computed(() => page.props.auth?.user ?? null)
@@ -53,7 +56,7 @@ onBeforeUnmount(() => {
 })
 
 function deleteTask(taskId) {
-    if (!window.confirm('Delete this task?')) return
+    if (!window.confirm(t('projects.confirm_delete_task'))) return
     router.delete(route('tasks.destroy', taskId), { preserveScroll: true })
 }
 
@@ -77,9 +80,9 @@ function statusBadgeClass(status) {
 }
 
 function statusLabel(status) {
-    if (status === 'todo')  return 'To do'
-    if (status === 'doing') return 'Doing'
-    if (status === 'done')  return 'Done'
+    if (status === 'todo')  return t('status.todo')
+    if (status === 'doing') return t('status.doing')
+    if (status === 'done')  return t('status.done')
     return status
 }
 
@@ -131,7 +134,7 @@ function uploadProgressImages(event) {
 
 function deleteProgressImage(imageId) {
     if (!selectedTask.value) return
-    if (!window.confirm('Delete this progress image?')) return
+    if (!window.confirm(t('projects.confirm_delete_image'))) return
     router.delete(route('tasks.progress-images.destroy', [selectedTask.value.id, imageId]), { preserveScroll: true })
 }
 
@@ -180,7 +183,7 @@ function saveDescription() {
         {
             preserveScroll: true,
             onSuccess: () => cancelEditDescription(),
-            onError: (errors) => { descriptionError.value = errors.description || 'Could not save.' },
+            onError: (errors) => { descriptionError.value = errors.description || t('common.could_not_save') },
             onFinish: () => { isSavingDescription.value = false },
         }
     )
@@ -206,7 +209,7 @@ function cancelRename() {
 function saveRename() {
     const name = renameValue.value.trim()
     if (!name) {
-        renameError.value = 'Name is required.'
+        renameError.value = t('projects.name_required')
         return
     }
     if (name === props.project.name) {
@@ -221,7 +224,7 @@ function saveRename() {
         {
             preserveScroll: true,
             onSuccess: () => cancelRename(),
-            onError: (errors) => { renameError.value = errors.name || 'Could not save.' },
+            onError: (errors) => { renameError.value = errors.name || t('common.could_not_save') },
             onFinish: () => { isSavingRename.value = false },
         }
     )
@@ -234,7 +237,7 @@ function saveRename() {
         <div class="app-panel p-5">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div class="min-w-0 flex-1">
-                    <div class="app-label">Project</div>
+                    <div class="app-label">{{ t('projects.label_single') }}</div>
 
                     <div v-if="!isRenaming" class="mt-1 flex items-start gap-2">
                         <h1 class="break-words text-2xl font-bold text-[var(--ink)] [overflow-wrap:anywhere]">
@@ -245,8 +248,8 @@ function saveRename() {
                             type="button"
                             @click="startRename"
                             class="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-transparent text-[var(--slate-soft)] transition hover:border-[var(--line)] hover:bg-[var(--panel-strong)] hover:text-[var(--ink)] focus-visible:opacity-100"
-                            aria-label="Rename project"
-                            title="Rename project"
+                            :aria-label="t('projects.rename')"
+                            :title="t('projects.rename')"
                         >
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -272,7 +275,7 @@ function saveRename() {
                                 :disabled="isSavingRename"
                                 class="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[var(--accent-deep)] disabled:opacity-50"
                             >
-                                {{ isSavingRename ? 'Saving…' : 'Save' }}
+                                {{ isSavingRename ? t('common.saving') : t('common.save') }}
                             </button>
                             <button
                                 type="button"
@@ -280,23 +283,23 @@ function saveRename() {
                                 :disabled="isSavingRename"
                                 class="rounded-lg border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)] disabled:opacity-50"
                             >
-                                Cancel
+                                {{ t('common.cancel') }}
                             </button>
                         </div>
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="app-panel-muted px-3 py-2 text-xs font-semibold text-[var(--slate-soft)]">
-                        {{ tasks.length }} task{{ tasks.length === 1 ? '' : 's' }}
+                        {{ tasks.length }} {{ t('projects.tasks') }}
                     </span>
                     <span class="app-panel-muted px-3 py-2 text-xs font-semibold text-[var(--slate-soft)]">
-                        {{ members.length }} member{{ members.length === 1 ? '' : 's' }}
+                        {{ members.length }} {{ t('projects.team') }}
                     </span>
                     <Link :href="route('projects.index')" class="app-button-secondary gap-1.5">
                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
-                        Projects
+                        {{ t('projects.title') }}
                     </Link>
                 </div>
             </div>
@@ -327,7 +330,7 @@ function saveRename() {
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
-                Syncing…
+                {{ t('common.syncing') }}
             </div>
         </Transition>
 
@@ -336,8 +339,8 @@ function saveRename() {
             <aside class="order-2 min-w-0 space-y-5 xl:order-none xl:sticky xl:top-20 xl:self-start">
 
                 <div v-if="can.manageTasks" class="app-panel p-4">
-                    <h2 class="app-section-title mb-0.5">Add task</h2>
-                    <p class="mb-4 text-xs text-[var(--slate-soft)]">Create a work item, then track it inside.</p>
+                    <h2 class="app-section-title mb-0.5">{{ t('projects.add_task_title') }}</h2>
+                    <p class="mb-4 text-xs text-[var(--slate-soft)]">{{ t('projects.add_task_desc') }}</p>
                     <form
                         @submit.prevent="form.post(route('projects.tasks.store', project.id), {
                             preserveScroll: true,
@@ -345,22 +348,22 @@ function saveRename() {
                         })"
                         class="space-y-2.5"
                     >
-                        <input v-model="form.title" class="app-input" placeholder="Task title" />
+                        <input v-model="form.title" class="app-input" :placeholder="t('projects.task_title_placeholder')" />
                         <select v-model="form.assigned_to" class="app-input">
-                            <option value="">Unassigned</option>
+                            <option value="">{{ t('common.unassigned') }}</option>
                             <option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option>
                         </select>
                         <input v-model="form.due_date" type="date" class="app-input" />
-                        <button class="app-button-primary w-full">Add task</button>
+                        <button class="app-button-primary w-full">{{ t('projects.add_task_title') }}</button>
                     </form>
                 </div>
 
                 <div class="app-panel p-4">
                     <div class="mb-3 flex items-center justify-between gap-3">
                         <div>
-                            <h2 class="app-section-title">Team</h2>
+                            <h2 class="app-section-title">{{ t('projects.team') }}</h2>
                             <p v-if="!can.manageMembers" class="mt-0.5 text-xs text-[var(--slate-soft)]">
-                                Office users can manage members.
+                                {{ t('projects.team_desc') }}
                             </p>
                         </div>
                         <span class="rounded-full bg-[var(--panel-muted)] px-2.5 py-1 text-xs font-bold text-[var(--slate)]">
@@ -369,7 +372,7 @@ function saveRename() {
                     </div>
 
                     <div v-if="members.length === 0" class="rounded-lg border border-dashed border-[var(--line)] px-3 py-4 text-center text-sm text-[var(--slate-soft)]">
-                        No members yet.
+                        {{ t('projects.team_empty') }}
                     </div>
 
                     <ul v-else class="space-y-2">
@@ -389,21 +392,21 @@ function saveRename() {
                                     <div class="min-w-0">
                                         <div class="truncate text-xs font-semibold text-[var(--ink)]">{{ m.name }}</div>
                                         <div class="text-[0.64rem] font-semibold capitalize text-[var(--accent)]">
-                                            {{ m.pivot?.role ?? 'member' }}
+                                            {{ t(`projects.role_${m.pivot?.role ?? 'member'}`) }}
                                         </div>
                                     </div>
                                 </div>
-                                <span v-if="isCurrentUser(m.id)" class="shrink-0 text-[0.64rem] font-bold text-[var(--slate-soft)]">You</span>
+                                <span v-if="isCurrentUser(m.id)" class="shrink-0 text-[0.64rem] font-bold text-[var(--slate-soft)]">{{ t('common.you') }}</span>
                                 <button
                                     v-else-if="can.manageMembers"
                                     type="button"
                                     @click.prevent.stop="
-                                        window.confirm('Remove this member?') &&
+                                        window.confirm(t('projects.confirm_remove_member')) &&
                                         router.delete(route('projects.members.destroy', [project.id, m.id]), { preserveScroll: true })
                                     "
                                     class="shrink-0 text-[0.64rem] font-semibold text-rose-600 transition hover:text-rose-800"
                                 >
-                                    Remove
+                                    {{ t('common.remove') }}
                                 </button>
                             </div>
                             <select
@@ -413,10 +416,10 @@ function saveRename() {
                                 :disabled="isCurrentUser(m.id)"
                                 @change="updateMemberRole(m.id, $event.target.value)"
                             >
-                                <option value="member">member</option>
-                                <option value="client">client</option>
-                                <option value="worker">worker</option>
-                                <option value="office">office</option>
+                                <option value="member">{{ t('projects.role_member') }}</option>
+                                <option value="client">{{ t('projects.role_client') }}</option>
+                                <option value="worker">{{ t('projects.role_worker') }}</option>
+                                <option value="office">{{ t('projects.role_office') }}</option>
                             </select>
                         </li>
                     </ul>
@@ -427,16 +430,16 @@ function saveRename() {
                         class="mt-4 space-y-2.5 border-t border-[var(--line)] pt-4"
                     >
                         <select v-model="memberForm.user_id" class="app-input">
-                            <option value="">Select user</option>
+                            <option value="">{{ t('projects.select_user') }}</option>
                             <option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option>
                         </select>
                         <select v-model="memberForm.role" class="app-input">
-                            <option value="">member</option>
-                            <option value="client">client</option>
-                            <option value="worker">worker</option>
-                            <option value="office">office</option>
+                            <option value="">{{ t('projects.role_member') }}</option>
+                            <option value="client">{{ t('projects.role_client') }}</option>
+                            <option value="worker">{{ t('projects.role_worker') }}</option>
+                            <option value="office">{{ t('projects.role_office') }}</option>
                         </select>
-                        <button class="app-button-secondary w-full">Add member</button>
+                        <button class="app-button-secondary w-full">{{ t('projects.add_member') }}</button>
                     </form>
                 </div>
             </aside>
@@ -446,8 +449,8 @@ function saveRename() {
                 <div class="app-panel overflow-hidden">
                     <div class="flex items-center justify-between gap-3 border-b border-[var(--line)] px-5 py-3.5">
                         <div>
-                            <h2 class="app-section-title">Tasks</h2>
-                            <p class="text-xs text-[var(--slate-soft)]">Select a task to view and update it.</p>
+                            <h2 class="app-section-title">{{ t('projects.tasks') }}</h2>
+                            <p class="text-xs text-[var(--slate-soft)]">{{ t('projects.tasks_desc') }}</p>
                         </div>
                         <span class="rounded-full bg-[var(--panel-muted)] px-2.5 py-1 text-xs font-bold text-[var(--slate)]">{{ tasks.length }}</span>
                     </div>
@@ -458,40 +461,40 @@ function saveRename() {
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
                         </div>
-                        <div class="text-sm text-[var(--slate-soft)]">No tasks yet. Add one above.</div>
+                        <div class="text-sm text-[var(--slate-soft)]">{{ t('projects.empty_tasks') }}</div>
                     </div>
 
                     <div v-else class="divide-y divide-[var(--line)]">
                         <div
-                            v-for="t in tasks"
-                            :key="t.id"
+                            v-for="task in tasks"
+                            :key="task.id"
                             role="button"
                             tabindex="0"
-                            @click="openTask(t.id)"
-                            @keydown.enter.prevent="openTask(t.id)"
-                            @keydown.space.prevent="openTask(t.id)"
+                            @click="openTask(task.id)"
+                            @keydown.enter.prevent="openTask(task.id)"
+                            @keydown.space.prevent="openTask(task.id)"
                             class="grid min-w-0 cursor-pointer gap-3 px-5 py-3.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)] hover:bg-[var(--panel-strong)] sm:grid-cols-[5rem_minmax(0,1fr)_auto] sm:items-center"
-                            :class="selectedTask?.id === t.id ? 'bg-blue-50/60 dark:bg-blue-500/10' : ''"
+                            :class="selectedTask?.id === task.id ? 'bg-blue-50/60 dark:bg-blue-500/10' : ''"
                         >
                             <span
                                 class="w-fit rounded-full px-2.5 py-1 text-xs font-semibold ring-1"
-                                :class="statusBadgeClass(t.status)"
+                                :class="statusBadgeClass(task.status)"
                             >
-                                {{ statusLabel(t.status) }}
+                                {{ statusLabel(task.status) }}
                             </span>
 
                             <div class="min-w-0">
-                                <div class="break-words text-sm font-semibold text-[var(--ink)] [overflow-wrap:anywhere]">{{ t.title }}</div>
+                                <div class="break-words text-sm font-semibold text-[var(--ink)] [overflow-wrap:anywhere]">{{ task.title }}</div>
                                 <div class="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-[var(--slate-soft)]">
-                                    <span>{{ t.assignee ? t.assignee.name : 'Unassigned' }}</span>
-                                    <span v-if="t.due_date">Due {{ t.due_date }}</span>
-                                    <span>{{ t.comments?.length ?? 0 }} comment{{ (t.comments?.length ?? 0) === 1 ? '' : 's' }}</span>
-                                    <span>{{ t.progress_images?.length ?? 0 }} photo{{ (t.progress_images?.length ?? 0) === 1 ? '' : 's' }}</span>
+                                    <span>{{ task.assignee ? task.assignee.name : t('common.unassigned') }}</span>
+                                    <span v-if="task.due_date">{{ t('calendar.due') }} {{ task.due_date }}</span>
+                                    <span>{{ task.comments?.length ?? 0 }}</span>
+                                    <span>{{ task.progress_images?.length ?? 0 }}</span>
                                 </div>
                             </div>
 
-                            <div class="text-xs font-semibold" :class="selectedTask?.id === t.id ? 'text-[var(--accent)]' : 'text-[var(--slate-soft)]'">
-                                {{ selectedTask?.id === t.id ? 'Selected' : 'Open' }}
+                            <div class="text-xs font-semibold" :class="selectedTask?.id === task.id ? 'text-[var(--accent)]' : 'text-[var(--slate-soft)]'">
+                                {{ selectedTask?.id === task.id ? t('common.selected') : t('common.open') }}
                             </div>
                         </div>
                     </div>
@@ -504,7 +507,7 @@ function saveRename() {
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
                             </svg>
                         </div>
-                        <div class="text-sm text-[var(--slate-soft)]">Select a task to view details, photos, and comments.</div>
+                        <div class="text-sm text-[var(--slate-soft)]">{{ t('projects.task_details_empty') }}</div>
                     </div>
 
                     <div v-else>
@@ -515,7 +518,7 @@ function saveRename() {
                                         <span class="rounded-full px-2.5 py-1 text-xs font-semibold ring-1" :class="statusBadgeClass(selectedTask.status)">
                                             {{ statusLabel(selectedTask.status) }}
                                         </span>
-                                        <span class="text-xs text-[var(--slate-soft)]">Task details</span>
+                                        <span class="text-xs text-[var(--slate-soft)]">{{ t('projects.task_details') }}</span>
                                     </div>
                                     <h2 class="mt-2 break-words text-lg font-bold text-[var(--ink)] [overflow-wrap:anywhere]">
                                         {{ selectedTask.title }}
@@ -528,13 +531,13 @@ function saveRename() {
                                         @click.prevent.stop="deleteTask(selectedTask.id)"
                                         class="app-button-danger w-fit"
                                     >
-                                        Delete task
+                                        {{ t('projects.delete_task') }}
                                     </button>
                                     <button
                                         type="button"
                                         @click.prevent.stop="closeTask"
-                                        aria-label="Close task"
-                                        title="Close task"
+                                        :aria-label="t('projects.close_task')"
+                                        :title="t('projects.close_task')"
                                         class="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--slate-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
                                     >
                                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -547,23 +550,23 @@ function saveRename() {
                             <!-- Meta -->
                             <div class="mt-3 flex flex-wrap gap-2 text-sm">
                                 <span class="app-panel-muted px-3 py-1.5 text-xs text-[var(--slate-soft)]">
-                                    Assignee: <strong class="font-semibold text-[var(--ink)]">{{ selectedTask.assignee?.name ?? 'Unassigned' }}</strong>
+                                    {{ t('projects.assignee_label') }} <strong class="font-semibold text-[var(--ink)]">{{ selectedTask.assignee?.name ?? t('common.unassigned') }}</strong>
                                 </span>
                                 <span class="app-panel-muted px-3 py-1.5 text-xs text-[var(--slate-soft)]">
-                                    Due: <strong class="font-semibold text-[var(--ink)]">{{ selectedTask.due_date ?? 'None' }}</strong>
+                                    {{ t('projects.due_label') }} <strong class="font-semibold text-[var(--ink)]">{{ selectedTask.due_date ?? t('common.none') }}</strong>
                                 </span>
                             </div>
 
                             <div class="mt-4">
                                 <div class="mb-1.5 flex items-center justify-between">
-                                    <div class="app-label">Description</div>
+                                    <div class="app-label">{{ t('projects.description') }}</div>
                                     <button
                                         v-if="can.manageTasks && !isEditingDescription"
                                         type="button"
                                         @click.prevent.stop="startEditDescription"
                                         class="text-xs font-semibold text-[var(--accent)] transition hover:text-[var(--accent-deep)]"
                                     >
-                                        {{ selectedTask.description ? 'Edit' : 'Add description' }}
+                                        {{ selectedTask.description ? t('common.edit') : t('projects.add_description') }}
                                     </button>
                                 </div>
 
@@ -573,7 +576,7 @@ function saveRename() {
                                         class="whitespace-pre-wrap break-words rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2.5 text-sm text-[var(--slate)] [overflow-wrap:anywhere]"
                                     >{{ selectedTask.description }}</p>
                                     <p v-else class="rounded-lg border border-dashed border-[var(--line)] px-3 py-2.5 text-xs italic text-[var(--slate-soft)]">
-                                        No description yet.
+                                        {{ t('projects.no_description') }}
                                     </p>
                                 </div>
 
@@ -584,7 +587,7 @@ function saveRename() {
                                         :disabled="isSavingDescription"
                                         rows="4"
                                         maxlength="10000"
-                                        placeholder="Add details, links, or context for this task…"
+                                        :placeholder="t('projects.description_placeholder')"
                                         class="app-input w-full text-sm"
                                     />
                                     <div v-if="descriptionError" class="text-xs text-rose-600">{{ descriptionError }}</div>
@@ -595,7 +598,7 @@ function saveRename() {
                                             :disabled="isSavingDescription"
                                             class="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[var(--accent-deep)] disabled:opacity-50"
                                         >
-                                            {{ isSavingDescription ? 'Saving…' : 'Save' }}
+                                            {{ isSavingDescription ? t('common.saving') : t('common.save') }}
                                         </button>
                                         <button
                                             type="button"
@@ -603,14 +606,14 @@ function saveRename() {
                                             :disabled="isSavingDescription"
                                             class="rounded-lg border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--slate)] transition hover:bg-[var(--panel-muted)] disabled:opacity-50"
                                         >
-                                            Cancel
+                                            {{ t('common.cancel') }}
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
                             <div v-if="can.changeTaskStatus" class="mt-4">
-                                <div class="app-label mb-2">Change status</div>
+                                <div class="app-label mb-2">{{ t('projects.change_status') }}</div>
                                 <div class="inline-flex flex-wrap rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] p-1 gap-0.5">
                                     <button
                                         v-for="status in statusOptions"
@@ -632,7 +635,7 @@ function saveRename() {
 
                             <div class="border-b border-[var(--line)] px-5 py-4 lg:border-b-0 lg:border-r">
                                 <div class="mb-3 flex items-center justify-between gap-3">
-                                    <h3 class="app-section-title">Progress photos</h3>
+                                    <h3 class="app-section-title">{{ t('projects.progress_photos') }}</h3>
                                     <span class="text-xs text-[var(--slate-soft)]">{{ selectedTask.progress_images?.length ?? 0 }}</span>
                                 </div>
 
@@ -649,12 +652,12 @@ function saveRename() {
                                         :disabled="progressImageForm.processing || progressImageForm.images.length === 0"
                                         class="app-button-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
                                     >
-                                        {{ progressImageForm.processing ? 'Uploading…' : 'Upload photos' }}
+                                        {{ progressImageForm.processing ? t('avatar.uploading') : t('projects.upload_photos') }}
                                     </button>
                                 </form>
 
                                 <div v-if="(selectedTask.progress_images?.length ?? 0) === 0" class="mt-4 rounded-lg border border-dashed border-[var(--line)] px-3 py-6 text-center text-xs text-[var(--slate-soft)]">
-                                    No photos yet.
+                                    {{ t('projects.no_photos') }}
                                 </div>
 
                                 <div v-else class="mt-4 grid gap-3 sm:grid-cols-2">
@@ -668,14 +671,14 @@ function saveRename() {
                                         </a>
                                         <figcaption class="space-y-1.5 px-3 py-2.5 text-xs text-[var(--slate-soft)]">
                                             <div class="truncate font-medium text-[var(--ink)]">{{ image.original_name }}</div>
-                                            <div>{{ image.user?.name ?? 'Unknown' }} · {{ new Date(image.created_at).toLocaleDateString() }}</div>
+                                            <div>{{ image.user?.name ?? t('common.unknown') }} · {{ new Date(image.created_at).toLocaleDateString() }}</div>
                                             <button
                                                 v-if="isCurrentUser(image.user?.id) || can.manageTasks"
                                                 type="button"
                                                 @click="deleteProgressImage(image.id)"
                                                 class="font-semibold text-rose-600 transition hover:text-rose-800"
                                             >
-                                                Delete
+                                                {{ t('common.delete') }}
                                             </button>
                                         </figcaption>
                                     </figure>
@@ -683,44 +686,44 @@ function saveRename() {
                             </div>
 
                             <div class="px-5 py-4">
-                                <h3 class="app-section-title mb-3">Task comments</h3>
+                                <h3 class="app-section-title mb-3">{{ t('projects.task_comments') }}</h3>
 
                                 <form @submit.prevent="submitTaskComment" class="space-y-2.5">
                                     <textarea
                                         v-model="taskCommentForm.body"
                                         class="app-input min-h-24 resize-y"
                                         rows="3"
-                                        placeholder="Write a comment…"
+                                        :placeholder="t('projects.comment_placeholder')"
                                     />
                                     <button
                                         type="submit"
                                         :disabled="taskCommentForm.processing"
                                         class="app-button-primary ml-auto disabled:cursor-not-allowed disabled:opacity-50"
                                     >
-                                        {{ taskCommentForm.processing ? 'Sending…' : 'Send comment' }}
+                                        {{ taskCommentForm.processing ? t('common.sending') : t('projects.send_comment') }}
                                     </button>
                                 </form>
 
                                 <div v-if="(selectedTask.comments?.length ?? 0) === 0" class="mt-5 rounded-lg border border-dashed border-[var(--line)] px-3 py-6 text-center text-xs text-[var(--slate-soft)]">
-                                    No comments yet.
+                                    {{ t('projects.no_comments') }}
                                 </div>
 
                                 <div v-else class="mt-5 divide-y divide-[var(--line)] border-t border-[var(--line)]">
                                     <div v-for="c in selectedTask.comments" :key="c.id" class="py-4">
                                         <div class="mb-2 flex items-start justify-between gap-3">
                                             <div class="min-w-0">
-                                                <span class="text-xs font-semibold text-[var(--ink)]">{{ c.user?.name ?? 'Unknown' }}</span>
-                                                <span v-if="isCurrentUser(c.user?.id)" class="ml-1 text-[0.65rem] font-bold text-[var(--accent)]">you</span>
+                                                <span class="text-xs font-semibold text-[var(--ink)]">{{ c.user?.name ?? t('common.unknown') }}</span>
+                                                <span v-if="isCurrentUser(c.user?.id)" class="ml-1 text-[0.65rem] font-bold text-[var(--accent)]">{{ t('common.you_inline') }}</span>
                                                 <div class="text-[0.65rem] text-[var(--slate-soft)]">{{ new Date(c.created_at).toLocaleString() }}</div>
                                             </div>
                                             <button
                                                 v-if="isCurrentUser(c.user?.id)"
                                                 type="button"
                                                 :disabled="isBusy"
-                                                @click="window.confirm('Delete this comment?') && router.delete(route('tasks.comments.destroy', [selectedTask.id, c.id]), { preserveScroll: true })"
+                                                @click="window.confirm(t('projects.confirm_delete_comment')) && router.delete(route('tasks.comments.destroy', [selectedTask.id, c.id]), { preserveScroll: true })"
                                                 class="shrink-0 text-xs font-semibold text-rose-600 transition hover:text-rose-800 disabled:opacity-50"
                                             >
-                                                Delete
+                                                {{ t('common.delete') }}
                                             </button>
                                         </div>
                                         <div class="whitespace-pre-wrap break-words text-sm leading-6 text-[var(--ink)] [overflow-wrap:anywhere]">{{ c.body }}</div>

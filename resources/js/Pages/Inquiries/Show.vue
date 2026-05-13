@@ -1,8 +1,15 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Link, router } from '@inertiajs/vue3'
+import { useT } from '@/i18n/useT'
+
+const { t } = useT()
 
 const props = defineProps({ inquiry: Object })
+
+function statusLabel(status) {
+    return t(`status.${status}`)
+}
 
 function convertToProject() {
     router.post(route('inquiries.convert', props.inquiry.id), {}, { preserveScroll: true })
@@ -25,9 +32,9 @@ function statusBadge(status) {
         <template #header>
             <div class="flex items-center justify-between gap-4">
                 <div class="flex min-w-0 items-center gap-3">
-                    <h1 class="truncate text-xl font-bold text-[var(--ink)]">Inquiry #{{ inquiry.id }}</h1>
+                    <h1 class="truncate text-xl font-bold text-[var(--ink)]">{{ t('inquiries.label_single') }} #{{ inquiry.id }}</h1>
                     <span class="shrink-0 rounded-full px-2.5 py-1 text-[0.64rem] font-bold uppercase tracking-wide" :class="statusBadge(inquiry.status)">
-                        {{ inquiry.status }}
+                        {{ statusLabel(inquiry.status) }}
                     </span>
                 </div>
                 <Link
@@ -37,7 +44,7 @@ function statusBadge(status) {
                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
-                    Back
+                    {{ t('common.back') }}
                 </Link>
             </div>
         </template>
@@ -47,8 +54,8 @@ function statusBadge(status) {
             <!-- Action buttons -->
             <div class="app-panel p-4">
                 <div class="mb-3">
-                    <div class="app-label">Actions</div>
-                    <p class="mt-1 text-xs text-[var(--slate-soft)]">Update the inquiry status or convert it into a project.</p>
+                    <div class="app-label">{{ t('inquiries.actions') }}</div>
+                    <p class="mt-1 text-xs text-[var(--slate-soft)]">{{ t('inquiries.actions_desc') }}</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button
@@ -59,7 +66,7 @@ function statusBadge(status) {
                         <svg class="mr-1.5 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        Mark contacted
+                        {{ t('inquiries.mark_contacted') }}
                     </button>
 
                     <button
@@ -70,7 +77,7 @@ function statusBadge(status) {
                         <svg class="mr-1.5 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                         </svg>
-                        Convert to project
+                        {{ t('inquiries.convert') }}
                     </button>
 
                     <Link
@@ -81,7 +88,7 @@ function statusBadge(status) {
                         <svg class="mr-1.5 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
                         </svg>
-                        Open project
+                        {{ t('inquiries.open_project') }}
                     </Link>
 
                     <button
@@ -92,7 +99,7 @@ function statusBadge(status) {
                         <svg class="mr-1.5 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
-                        Set back to new
+                        {{ t('inquiries.set_new') }}
                     </button>
                 </div>
             </div>
@@ -100,19 +107,19 @@ function statusBadge(status) {
             <!-- Inquiry details -->
             <div class="app-panel overflow-hidden">
                 <div class="border-b border-[var(--line)] px-5 py-3.5">
-                    <h2 class="text-sm font-bold text-[var(--ink)]">Contact details</h2>
+                    <h2 class="text-sm font-bold text-[var(--ink)]">{{ t('inquiries.contact_details') }}</h2>
                 </div>
 
                 <div class="divide-y divide-[var(--line)]">
                     <!-- Name -->
                     <div class="grid gap-1 px-5 py-4 sm:grid-cols-[9rem_1fr]">
-                        <div class="app-label self-center">Name</div>
+                        <div class="app-label self-center">{{ t('profile.name') }}</div>
                         <div class="font-semibold text-[var(--ink)]">{{ inquiry.name }}</div>
                     </div>
 
                     <!-- Email -->
                     <div class="grid gap-1 px-5 py-4 sm:grid-cols-[9rem_1fr]">
-                        <div class="app-label self-center">Email</div>
+                        <div class="app-label self-center">{{ t('profile.email') }}</div>
                         <a :href="`mailto:${inquiry.email}`" class="text-[var(--accent)] underline underline-offset-2 hover:text-[var(--accent-deep)]">
                             {{ inquiry.email }}
                         </a>
@@ -120,19 +127,19 @@ function statusBadge(status) {
 
                     <!-- Phone -->
                     <div v-if="inquiry.phone" class="grid gap-1 px-5 py-4 sm:grid-cols-[9rem_1fr]">
-                        <div class="app-label self-center">Phone</div>
+                        <div class="app-label self-center">{{ t('inquiries.phone') }}</div>
                         <a :href="`tel:${inquiry.phone}`" class="text-[var(--ink)] hover:text-[var(--accent)]">{{ inquiry.phone }}</a>
                     </div>
 
                     <!-- Message -->
                     <div class="grid gap-2 px-5 py-4 sm:grid-cols-[9rem_1fr]">
-                        <div class="app-label pt-1">Message</div>
+                        <div class="app-label pt-1">{{ t('inquiries.message') }}</div>
                         <pre class="whitespace-pre-wrap break-words rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] px-4 py-3 text-sm text-[var(--ink)] [overflow-wrap:anywhere]">{{ inquiry.message }}</pre>
                     </div>
 
                     <!-- Date -->
                     <div class="grid gap-1 px-5 py-4 sm:grid-cols-[9rem_1fr]">
-                        <div class="app-label self-center">Received</div>
+                        <div class="app-label self-center">{{ t('inquiries.received') }}</div>
                         <div class="text-sm text-[var(--slate-soft)]">{{ inquiry.created_at }}</div>
                     </div>
                 </div>

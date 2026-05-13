@@ -8,6 +8,9 @@ import { nextTick, watch } from 'vue'
 import { onBeforeUnmount, onMounted, computed, ref } from 'vue'
 import { Link, useForm, router, usePage } from '@inertiajs/vue3'
 import UserAvatar from '@/Components/UserAvatar.vue'
+import { useT } from '@/i18n/useT'
+
+const { t } = useT()
 
 const currentUser = computed(() => usePage().props.auth?.user ?? null)
 
@@ -68,7 +71,7 @@ function send() {
 }
 
 function deleteMessage(messageId) {
-    if (!window.confirm('Delete this message?')) return
+    if (!window.confirm(t('chat.delete_confirm'))) return
     const previousMessages = [...messagesLocal.value]
     messagesLocal.value = messagesLocal.value.filter((m) => m.id !== messageId)
     router.delete(route('chat.messages.destroy', [props.project.id, messageId]), {
@@ -108,8 +111,8 @@ function dateKey(d) { return new Date(d).toISOString().slice(0, 10) }
 function labelForDateKey(key) {
     const today = new Date().toISOString().slice(0, 10)
     const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
-    if (key === today) return 'Today'
-    if (key === yesterday) return 'Yesterday'
+    if (key === today) return t('chat.today')
+    if (key === yesterday) return t('chat.yesterday')
     return key
 }
 
@@ -140,15 +143,15 @@ onBeforeUnmount(() => timer && clearInterval(timer))
         <!-- Chat header -->
         <div class="flex items-center justify-between gap-4">
             <div class="min-w-0">
-                <div class="app-label">Chat</div>
+                <div class="app-label">{{ t('chat.show_label') }}</div>
                 <h1 class="mt-0.5 truncate text-2xl font-bold text-[var(--ink)]">{{ project.name }}</h1>
-                <div class="mt-0.5 text-sm text-[var(--slate-soft)]">Project conversation</div>
+                <div class="mt-0.5 text-sm text-[var(--slate-soft)]">{{ t('chat.show_subtitle') }}</div>
             </div>
             <Link :href="route('chat.index')" class="app-button-secondary shrink-0 gap-1.5">
                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-                Channels
+                {{ t('chat.channels') }}
             </Link>
         </div>
 
@@ -164,7 +167,7 @@ onBeforeUnmount(() => timer && clearInterval(timer))
                     :disabled="loadingOlder"
                     class="rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] px-4 py-2 text-xs font-semibold text-[var(--slate)] transition hover:bg-white disabled:opacity-50"
                 >
-                    {{ loadingOlder ? 'Loading…' : 'Load older messages' }}
+                    {{ loadingOlder ? t('common.loading') : t('chat.load_older') }}
                 </button>
             </div>
 
@@ -175,7 +178,7 @@ onBeforeUnmount(() => timer && clearInterval(timer))
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
                 </div>
-                <div class="text-sm text-[var(--slate-soft)]">No messages yet. Start the conversation!</div>
+                <div class="text-sm text-[var(--slate-soft)]">{{ t('chat.empty_messages') }}</div>
             </div>
 
             <template v-for="(m, i) in messagesLocal" :key="m.id">
@@ -196,7 +199,7 @@ onBeforeUnmount(() => timer && clearInterval(timer))
                     class="flex items-center gap-2 py-1 text-xs text-[var(--accent)]"
                 >
                     <div class="flex-1 border-t border-[var(--accent)]/40" />
-                    <span class="font-semibold">New</span>
+                    <span class="font-semibold">{{ t('chat.new_divider') }}</span>
                     <div class="flex-1 border-t border-[var(--accent)]/40" />
                 </div>
 
@@ -263,7 +266,7 @@ onBeforeUnmount(() => timer && clearInterval(timer))
                                 @click="deleteMessage(m.id)"
                                 class="font-semibold text-rose-400 transition hover:text-rose-600"
                             >
-                                Delete
+                                {{ t('common.delete') }}
                             </button>
                         </div>
                     </div>
@@ -280,7 +283,7 @@ onBeforeUnmount(() => timer && clearInterval(timer))
                     v-model="form.body"
                     class="app-input min-h-20 resize-none"
                     rows="3"
-                    placeholder="Write a message… (Enter to add a new line)"
+                    :placeholder="t('chat.placeholder')"
                 />
 
                 <!-- File upload row -->
@@ -294,7 +297,7 @@ onBeforeUnmount(() => timer && clearInterval(timer))
                             @change="e => form.attachments = Array.from(e.target.files)"
                         />
                         <div v-if="form.attachments?.length" class="mt-1.5 text-xs text-[var(--slate-soft)]">
-                            {{ form.attachments.length }} file{{ form.attachments.length === 1 ? '' : 's' }} selected
+                            {{ form.attachments.length }}
                         </div>
                     </div>
                     <button
@@ -305,13 +308,13 @@ onBeforeUnmount(() => timer && clearInterval(timer))
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
-                        {{ form.processing ? 'Sending…' : 'Send' }}
+                        {{ form.processing ? t('common.sending') : t('chat.send') }}
                     </button>
                 </div>
 
                 <!-- Upload progress -->
                 <div v-if="form.progress" class="space-y-1">
-                    <div class="text-xs text-[var(--slate-soft)]">Uploading {{ form.progress.percentage }}%</div>
+                    <div class="text-xs text-[var(--slate-soft)]">{{ t('chat.uploading') }} {{ form.progress.percentage }}%</div>
                     <div class="h-1.5 overflow-hidden rounded-full bg-[var(--panel-muted)]">
                         <div class="h-1.5 bg-[var(--accent)] transition-all" :style="{ width: form.progress.percentage + '%' }" />
                     </div>

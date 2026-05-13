@@ -1,6 +1,9 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
+import { useT } from '@/i18n/useT'
+
+const { t } = useT()
 
 defineProps({
     activities: {
@@ -14,10 +17,10 @@ defineProps({
 })
 
 function moduleLabel(module) {
-    if (module === 'projects') return 'Projects'
-    if (module === 'chat') return 'Chat'
-    if (module === 'inquiries') return 'Inquiries'
-    return 'Activity'
+    if (module === 'projects') return t('dashboard.projects')
+    if (module === 'chat') return t('nav.chat')
+    if (module === 'inquiries') return t('dashboard.inquiries')
+    return t('nav.activity')
 }
 
 function moduleBorderClass(module) {
@@ -46,15 +49,15 @@ function relativeTime(isoString) {
 </script>
 
 <template>
-    <Head title="Activity" />
+    <Head :title="t('dashboard.title')" />
 
     <AuthenticatedLayout>
         <div class="space-y-6">
             <!-- Page title -->
             <div>
-                <div class="app-label">Overview</div>
-                <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">Activity</h1>
-                <p class="mt-1 text-sm text-[var(--slate-soft)]">Recent updates across all workspace modules.</p>
+                <div class="app-label">{{ t('dashboard.label') }}</div>
+                <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">{{ t('dashboard.title') }}</h1>
+                <p class="mt-1 text-sm text-[var(--slate-soft)]">{{ t('dashboard.subtitle') }}</p>
             </div>
 
             <div class="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(240px,0.55fr)]">
@@ -62,9 +65,9 @@ function relativeTime(isoString) {
                 <!-- ── Activity feed ───────────────────────────── -->
                 <div class="app-panel overflow-hidden">
                     <div class="flex items-center justify-between gap-3 border-b border-[var(--line)] px-5 py-3.5">
-                        <h2 class="text-sm font-bold text-[var(--ink)]">Recent activity</h2>
+                        <h2 class="text-sm font-bold text-[var(--ink)]">{{ t('dashboard.recent_activity') }}</h2>
                         <span class="rounded-full bg-[var(--panel-muted)] px-2.5 py-0.5 text-xs font-semibold text-[var(--slate-soft)]">
-                            {{ activities.length }} item{{ activities.length === 1 ? '' : 's' }}
+                            {{ activities.length }}
                         </span>
                     </div>
 
@@ -76,8 +79,8 @@ function relativeTime(isoString) {
                             </svg>
                         </div>
                         <div>
-                            <div class="font-semibold text-[var(--ink)]">No activity yet</div>
-                            <div class="mt-1 text-sm text-[var(--slate-soft)]">Updates will appear here as the workspace is used.</div>
+                            <div class="font-semibold text-[var(--ink)]">{{ t('dashboard.no_activity_title') }}</div>
+                            <div class="mt-1 text-sm text-[var(--slate-soft)]">{{ t('dashboard.no_activity_desc') }}</div>
                         </div>
                     </div>
 
@@ -111,9 +114,9 @@ function relativeTime(isoString) {
 
                     <!-- Snapshot card -->
                     <div class="app-panel p-5">
-                        <div class="app-label">Last 24 hours</div>
-                        <h2 class="mt-1 text-base font-bold text-[var(--ink)]">Activity snapshot</h2>
-                        <p class="mt-1.5 text-sm text-[var(--slate-soft)]">Recent updates per module.</p>
+                        <div class="app-label">{{ t('dashboard.last_24h') }}</div>
+                        <h2 class="mt-1 text-base font-bold text-[var(--ink)]">{{ t('dashboard.snapshot') }}</h2>
+                        <p class="mt-1.5 text-sm text-[var(--slate-soft)]">{{ t('dashboard.snapshot_desc') }}</p>
 
                         <div class="mt-4 space-y-2">
                             <!-- Projects -->
@@ -124,7 +127,7 @@ function relativeTime(isoString) {
                                     </svg>
                                 </div>
                                 <div class="flex-1">
-                                    <div class="text-xs font-medium text-blue-700 dark:text-blue-300">Projects</div>
+                                    <div class="text-xs font-medium text-blue-700 dark:text-blue-300">{{ t('dashboard.projects') }}</div>
                                 </div>
                                 <div class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ recentCounts.projects ?? 0 }}</div>
                             </div>
@@ -137,7 +140,7 @@ function relativeTime(isoString) {
                                     </svg>
                                 </div>
                                 <div class="flex-1">
-                                    <div class="text-xs font-medium text-emerald-700 dark:text-emerald-300">Chat messages</div>
+                                    <div class="text-xs font-medium text-emerald-700 dark:text-emerald-300">{{ t('dashboard.chat_messages') }}</div>
                                 </div>
                                 <div class="text-xl font-bold text-emerald-700 dark:text-emerald-300">{{ recentCounts.chat ?? 0 }}</div>
                             </div>
@@ -150,7 +153,7 @@ function relativeTime(isoString) {
                                     </svg>
                                 </div>
                                 <div class="flex-1">
-                                    <div class="text-xs font-medium text-amber-700 dark:text-amber-300">Inquiries</div>
+                                    <div class="text-xs font-medium text-amber-700 dark:text-amber-300">{{ t('dashboard.inquiries') }}</div>
                                 </div>
                                 <div class="text-xl font-bold text-amber-700 dark:text-amber-300">{{ recentCounts.inquiries ?? 0 }}</div>
                             </div>
@@ -159,23 +162,23 @@ function relativeTime(isoString) {
 
                     <div class="app-panel overflow-hidden">
                         <div class="border-b border-[var(--line)] px-5 py-3">
-                            <div class="app-label">Quick access</div>
+                            <div class="app-label">{{ t('dashboard.quick_access') }}</div>
                         </div>
                         <div class="divide-y divide-[var(--line)]">
                             <Link :href="route('projects.index')" class="group flex items-center justify-between px-5 py-3.5 text-sm transition hover:bg-[var(--panel-strong)]">
-                                <span class="font-medium text-[var(--ink)]">All projects</span>
+                                <span class="font-medium text-[var(--ink)]">{{ t('dashboard.all_projects') }}</span>
                                 <svg class="h-4 w-4 text-[var(--slate-soft)] transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                 </svg>
                             </Link>
                             <Link :href="route('chat.index')" class="group flex items-center justify-between px-5 py-3.5 text-sm transition hover:bg-[var(--panel-strong)]">
-                                <span class="font-medium text-[var(--ink)]">Chat channels</span>
+                                <span class="font-medium text-[var(--ink)]">{{ t('dashboard.chat_channels') }}</span>
                                 <svg class="h-4 w-4 text-[var(--slate-soft)] transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                 </svg>
                             </Link>
                             <Link :href="route('inquiries.index')" class="group flex items-center justify-between px-5 py-3.5 text-sm transition hover:bg-[var(--panel-strong)]">
-                                <span class="font-medium text-[var(--ink)]">Client inquiries</span>
+                                <span class="font-medium text-[var(--ink)]">{{ t('dashboard.client_inquiries') }}</span>
                                 <svg class="h-4 w-4 text-[var(--slate-soft)] transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                 </svg>

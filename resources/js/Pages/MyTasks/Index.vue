@@ -6,6 +6,9 @@ export default { layout: AuthenticatedLayout }
 <script setup>
 import { computed, ref } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
+import { useT } from '@/i18n/useT'
+
+const { t } = useT()
 
 const props = defineProps({
     tasks: { type: Array, default: () => [] },
@@ -39,9 +42,9 @@ const visibleTasks = computed(() => {
 })
 
 function statusLabel(status) {
-    if (status === 'todo') return 'To do'
-    if (status === 'doing') return 'Doing'
-    if (status === 'done') return 'Done'
+    if (status === 'todo') return t('status.todo')
+    if (status === 'doing') return t('status.doing')
+    if (status === 'done') return t('status.done')
     return status
 }
 function statusBadge(status) {
@@ -70,36 +73,36 @@ function setStatus(task, status) {
     )
 }
 
-const filters = [
-    { key: 'open', label: 'Open' },
-    { key: 'overdue', label: 'Overdue' },
-    { key: 'done', label: 'Done' },
-    { key: 'all', label: 'All' },
-]
+const filters = computed(() => [
+    { key: 'open', label: t('mytasks.filter_open') },
+    { key: 'overdue', label: t('mytasks.filter_overdue') },
+    { key: 'done', label: t('mytasks.filter_done') },
+    { key: 'all', label: t('mytasks.filter_all') },
+])
 </script>
 
 <template>
-    <Head title="My tasks" />
+    <Head :title="t('mytasks.title')" />
 
     <div class="space-y-5">
         <!-- Header -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <div class="app-label">Workspace</div>
-                <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">My tasks</h1>
-                <p class="mt-1 text-sm text-[var(--slate-soft)]">Tasks assigned to you across all your projects.</p>
+                <div class="app-label">{{ t('mytasks.label') }}</div>
+                <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">{{ t('mytasks.title') }}</h1>
+                <p class="mt-1 text-sm text-[var(--slate-soft)]">{{ t('mytasks.subtitle') }}</p>
             </div>
             <div class="grid grid-cols-3 gap-2 text-center sm:flex sm:gap-3">
                 <div class="rounded-xl border border-[var(--line)] bg-[var(--panel-bg)] px-4 py-2 shadow-sm">
-                    <div class="app-label">Open</div>
+                    <div class="app-label">{{ t('status.open') }}</div>
                     <div class="mt-0.5 text-xl font-bold text-[var(--ink)]">{{ counts.open }}</div>
                 </div>
                 <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 shadow-sm dark:border-rose-500/30 dark:bg-rose-500/10">
-                    <div class="text-[0.64rem] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-300">Overdue</div>
+                    <div class="text-[0.64rem] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-300">{{ t('status.overdue') }}</div>
                     <div class="mt-0.5 text-xl font-bold text-rose-700 dark:text-rose-300">{{ counts.overdue }}</div>
                 </div>
                 <div class="rounded-xl border border-[var(--line)] bg-[var(--panel-bg)] px-4 py-2 shadow-sm">
-                    <div class="app-label">Done</div>
+                    <div class="app-label">{{ t('status.done') }}</div>
                     <div class="mt-0.5 text-xl font-bold text-[var(--ink)]">{{ counts.done }}</div>
                 </div>
             </div>
@@ -128,9 +131,9 @@ const filters = [
                 </svg>
             </div>
             <div>
-                <div class="font-semibold text-[var(--ink)]">Nothing here</div>
+                <div class="font-semibold text-[var(--ink)]">{{ t('mytasks.empty_title') }}</div>
                 <div class="mt-1 text-sm text-[var(--slate-soft)]">
-                    {{ filter === 'overdue' ? 'No overdue tasks — nice!' : filter === 'done' ? 'No completed tasks yet.' : 'No tasks match this filter.' }}
+                    {{ filter === 'overdue' ? t('mytasks.empty_overdue') : filter === 'done' ? t('mytasks.empty_done') : t('mytasks.empty_default') }}
                 </div>
             </div>
         </div>
@@ -155,15 +158,15 @@ const filters = [
                                 v-if="isOverdue(task)"
                                 class="rounded-full bg-rose-100 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-rose-500/30"
                             >
-                                Overdue
+                                {{ t('status.overdue') }}
                             </span>
                         </div>
                         <div class="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--slate-soft)]">
                             <span v-if="task.project" class="truncate">{{ task.project.name }}</span>
                             <span v-if="task.due_date" :class="isOverdue(task) ? 'font-semibold text-rose-700 dark:text-rose-300' : ''">
-                                Due {{ formatDue(task.due_date) }}
+                                {{ t('calendar.due') }} {{ formatDue(task.due_date) }}
                             </span>
-                            <span v-else class="italic">No due date</span>
+                            <span v-else class="italic">{{ t('mytasks.no_due_date') }}</span>
                         </div>
                         <div v-if="task.description" class="mt-1 line-clamp-2 text-xs text-[var(--slate)]">
                             {{ task.description }}

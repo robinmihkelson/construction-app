@@ -2,6 +2,9 @@
 import InputError from '@/Components/InputError.vue';
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { useT } from '@/i18n/useT';
+
+const { t } = useT();
 
 const passwordInput = ref(null);
 const currentPasswordInput = ref(null);
@@ -34,7 +37,7 @@ const updatePassword = () => {
     <form @submit.prevent="updatePassword" class="space-y-5 max-w-lg">
 
         <div>
-            <label for="current_password" class="app-label mb-1.5 block">Current password</label>
+            <label for="current_password" class="app-label mb-1.5 block">{{ t('password.current') }}</label>
             <input
                 id="current_password"
                 ref="currentPasswordInput"
@@ -47,7 +50,7 @@ const updatePassword = () => {
         </div>
 
         <div>
-            <label for="password" class="app-label mb-1.5 block">New password</label>
+            <label for="password" class="app-label mb-1.5 block">{{ t('password.new') }}</label>
             <input
                 id="password"
                 ref="passwordInput"
@@ -60,7 +63,7 @@ const updatePassword = () => {
         </div>
 
         <div>
-            <label for="password_confirmation" class="app-label mb-1.5 block">Confirm new password</label>
+            <label for="password_confirmation" class="app-label mb-1.5 block">{{ t('password.confirm') }}</label>
             <input
                 id="password_confirmation"
                 v-model="form.password_confirmation"
@@ -73,7 +76,7 @@ const updatePassword = () => {
 
         <div class="flex items-center gap-4 pt-1">
             <button type="submit" :disabled="form.processing" class="app-button-primary disabled:opacity-60">
-                Update password
+                {{ t('password.update') }}
             </button>
             <Transition
                 enter-active-class="transition ease-in-out duration-200"
@@ -85,7 +88,7 @@ const updatePassword = () => {
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    Saved
+                    {{ t('common.saved') }}
                 </span>
             </Transition>
         </div>

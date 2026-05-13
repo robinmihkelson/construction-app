@@ -5,6 +5,9 @@ import ThemeToggle from '@/Components/ThemeToggle.vue';
 import UserAvatar from '@/Components/UserAvatar.vue';
 import GlobalSearch from '@/Components/GlobalSearch.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
+import { useT } from '@/i18n/useT';
+
+const { t } = useT();
 
 const showingMobileMenu = ref(false);
 const showUserMenu = ref(false);
@@ -12,6 +15,24 @@ const userMenuRef = ref(null);
 
 const page = usePage();
 const authUser = computed(() => page.props.auth?.user ?? null);
+const locale = computed(() => page.props.locale ?? 'et');
+
+const locales = [
+    { code: 'et', label: 'Eesti', flag: '/images/flags/et.webp' },
+    { code: 'en', label: 'English', flag: '/images/flags/en.webp' },
+    { code: 'fi', label: 'Suomi', flag: '/images/flags/fi.webp' },
+];
+
+function setLocale(code) {
+    if (code === locale.value) {
+        showUserMenu.value = false;
+        return;
+    }
+    showUserMenu.value = false;
+    window.location.assign(
+        route('locale.set', { locale: code, redirect: page.url ?? '/' })
+    );
+}
 
 const authUserName = computed(() => {
     const name = authUser.value?.name?.trim();
@@ -85,7 +106,7 @@ onMounted(() => {
                 >
                     <div>
                         <div class="text-base font-extrabold tracking-wider text-[var(--ink)]">PÄRLIKEE</div>
-                        <div class="text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[var(--slate-soft)]">Workspace</div>
+                        <div class="text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[var(--slate-soft)]">{{ t('nav.workspace_subtitle') }}</div>
                     </div>
                 </Link>
             </div>
@@ -103,7 +124,7 @@ onMounted(() => {
                     <svg class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.85">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    Activity
+                    {{ t('nav.activity') }}
                     <span v-if="route().current('dashboard')" class="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
                 </Link>
 
@@ -118,7 +139,7 @@ onMounted(() => {
                     <svg class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.85">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
                     </svg>
-                    Projects
+                    {{ t('nav.projects') }}
                     <span v-if="route().current('projects.*')" class="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
                 </Link>
 
@@ -133,7 +154,7 @@ onMounted(() => {
                     <svg class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.85">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                     </svg>
-                    My tasks
+                    {{ t('nav.my_tasks') }}
                     <span v-if="route().current('my-tasks.*')" class="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
                 </Link>
 
@@ -148,7 +169,7 @@ onMounted(() => {
                     <svg class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.85">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    Calendar
+                    {{ t('nav.calendar') }}
                     <span v-if="route().current('calendar.*')" class="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
                 </Link>
 
@@ -163,7 +184,7 @@ onMounted(() => {
                     <svg class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.85">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
-                    Chat
+                    {{ t('nav.chat') }}
                     <span v-if="route().current('chat*')" class="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
                 </Link>
 
@@ -178,7 +199,7 @@ onMounted(() => {
                     <svg class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.85">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                     </svg>
-                    Inquiries
+                    {{ t('nav.inquiries') }}
                     <span v-if="route().current('inquiries.*')" class="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
                 </Link>
 
@@ -220,8 +241,8 @@ onMounted(() => {
 
                     <Link
                         href="/"
-                        aria-label="Back to website"
-                        title="Back to website"
+                        :aria-label="t('nav.back_to_website')"
+                        :title="t('nav.back_to_website')"
                         class="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--slate-soft)] transition hover:bg-[var(--panel-muted)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] md:hidden"
                     >
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -236,7 +257,7 @@ onMounted(() => {
                         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
-                        Website
+                        {{ t('nav.website') }}
                     </Link>
 
                     <div class="relative ml-1" ref="userMenuRef">
@@ -244,7 +265,7 @@ onMounted(() => {
                             @click="showUserMenu = !showUserMenu"
                             class="rounded-full transition hover:ring-2 hover:ring-[var(--accent)]/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
                             :aria-expanded="showUserMenu"
-                            aria-label="User menu"
+                            :aria-label="t('nav.notifications')"
                         >
                             <UserAvatar
                                 :url="authUser?.avatar_url ?? null"
@@ -286,6 +307,27 @@ onMounted(() => {
                                     </div>
                                 </div>
 
+                                <div class="border-b border-[var(--line)] px-3 py-2.5">
+                                    <div class="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--slate-soft)]">{{ t('common.language') }}</div>
+                                    <div class="flex items-center gap-1.5">
+                                        <button
+                                            v-for="item in locales"
+                                            :key="item.code"
+                                            type="button"
+                                            :aria-label="item.label"
+                                            :aria-pressed="locale === item.code"
+                                            :title="item.label"
+                                            class="inline-flex h-8 w-10 items-center justify-center overflow-hidden rounded-full border bg-white p-0.5 transition"
+                                            :class="locale === item.code
+                                                ? 'border-[var(--accent)] ring-2 ring-[var(--accent)]/30'
+                                                : 'border-[var(--line)] hover:border-[var(--line-strong)]'"
+                                            @click="setLocale(item.code)"
+                                        >
+                                            <img :src="item.flag" :alt="item.label" class="h-full w-full rounded-full object-cover" />
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div class="p-1.5 space-y-0.5">
                                     <Link
                                         :href="route('profile.edit')"
@@ -296,7 +338,7 @@ onMounted(() => {
                                         <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                         </svg>
-                                        Profile settings
+                                        {{ t('nav.profile_settings') }}
                                     </Link>
 
                                     <div class="border-t border-[var(--line)] pt-1.5 mt-1.5">
@@ -310,7 +352,7 @@ onMounted(() => {
                                             <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                             </svg>
-                                            Log out
+                                            {{ t('nav.log_out') }}
                                         </Link>
                                     </div>
                                 </div>

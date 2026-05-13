@@ -8,6 +8,9 @@ import PushNotificationsForm from './Partials/PushNotificationsForm.vue';
 import UserAvatar from '@/Components/UserAvatar.vue';
 import { Head, usePage, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useT } from '@/i18n/useT';
+
+const { t } = useT();
 
 defineProps({
     mustVerifyEmail: Boolean,
@@ -18,16 +21,16 @@ const authUser = computed(() => usePage().props.auth?.user ?? null);
 </script>
 
 <template>
-    <Head title="Profile" />
+    <Head :title="t('profile.title')" />
 
     <AuthenticatedLayout>
         <div class="space-y-6">
 
             <!-- Page title -->
             <div>
-                <div class="app-label">Account</div>
-                <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">Profile settings</h1>
-                <p class="mt-1 text-sm text-[var(--slate-soft)]">Manage your name, email, password, and account.</p>
+                <div class="app-label">{{ t('profile.account_label') }}</div>
+                <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">{{ t('profile.title') }}</h1>
+                <p class="mt-1 text-sm text-[var(--slate-soft)]">{{ t('profile.subtitle') }}</p>
             </div>
 
             <!-- Avatar / identity hero -->
@@ -48,15 +51,15 @@ const authUser = computed(() => usePage().props.auth?.user ?? null);
                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
-                    Dashboard
+                    {{ t('profile.dashboard') }}
                 </Link>
             </div>
 
             <!-- Profile picture -->
             <div class="app-panel overflow-hidden">
                 <div class="border-b border-[var(--line)] px-6 py-4">
-                    <h2 class="text-sm font-bold text-[var(--ink)]">Profile picture</h2>
-                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">Upload a photo so teammates can recognize you in projects and chat.</p>
+                    <h2 class="text-sm font-bold text-[var(--ink)]">{{ t('profile.picture') }}</h2>
+                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">{{ t('profile.picture_desc') }}</p>
                 </div>
                 <div class="px-6 py-5">
                     <UpdateAvatarForm />
@@ -66,8 +69,8 @@ const authUser = computed(() => usePage().props.auth?.user ?? null);
             <!-- Profile information -->
             <div class="app-panel overflow-hidden">
                 <div class="border-b border-[var(--line)] px-6 py-4">
-                    <h2 class="text-sm font-bold text-[var(--ink)]">Profile information</h2>
-                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">Update your display name and email address.</p>
+                    <h2 class="text-sm font-bold text-[var(--ink)]">{{ t('profile.information') }}</h2>
+                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">{{ t('profile.information_desc') }}</p>
                 </div>
                 <div class="px-6 py-5">
                     <UpdateProfileInformationForm :must-verify-email="mustVerifyEmail" :status="status" />
@@ -77,8 +80,8 @@ const authUser = computed(() => usePage().props.auth?.user ?? null);
             <!-- Password -->
             <div class="app-panel overflow-hidden">
                 <div class="border-b border-[var(--line)] px-6 py-4">
-                    <h2 class="text-sm font-bold text-[var(--ink)]">Password</h2>
-                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">Use a long, random password to keep your account secure.</p>
+                    <h2 class="text-sm font-bold text-[var(--ink)]">{{ t('profile.password') }}</h2>
+                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">{{ t('profile.password_desc') }}</p>
                 </div>
                 <div class="px-6 py-5">
                     <UpdatePasswordForm />
@@ -88,8 +91,8 @@ const authUser = computed(() => usePage().props.auth?.user ?? null);
             <!-- Notifications -->
             <div class="app-panel overflow-hidden">
                 <div class="border-b border-[var(--line)] px-6 py-4">
-                    <h2 class="text-sm font-bold text-[var(--ink)]">Notifications</h2>
-                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">Push notifications for new chat messages on this device.</p>
+                    <h2 class="text-sm font-bold text-[var(--ink)]">{{ t('profile.notifications') }}</h2>
+                    <p class="mt-0.5 text-xs text-[var(--slate-soft)]">{{ t('profile.notifications_desc') }}</p>
                 </div>
                 <div class="px-6 py-5">
                     <PushNotificationsForm />
@@ -99,8 +102,8 @@ const authUser = computed(() => usePage().props.auth?.user ?? null);
             <!-- Danger zone -->
             <div class="overflow-hidden rounded-xl border border-rose-200 bg-white dark:border-rose-900/60 dark:bg-[var(--panel-bg)]">
                 <div class="border-b border-rose-100 bg-rose-50/60 px-6 py-4 dark:border-rose-900/40 dark:bg-rose-950/30">
-                    <h2 class="text-sm font-bold text-rose-800 dark:text-rose-300">Danger zone</h2>
-                    <p class="mt-0.5 text-xs text-rose-600 dark:text-rose-400">Irreversible actions — please proceed carefully.</p>
+                    <h2 class="text-sm font-bold text-rose-800 dark:text-rose-300">{{ t('profile.danger_zone') }}</h2>
+                    <p class="mt-0.5 text-xs text-rose-600 dark:text-rose-400">{{ t('profile.danger_zone_desc') }}</p>
                 </div>
                 <div class="px-6 py-5">
                     <DeleteUserForm />

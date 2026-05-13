@@ -2,6 +2,9 @@
 import { computed, ref } from 'vue';
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import UserAvatar from '@/Components/UserAvatar.vue';
+import { useT } from '@/i18n/useT';
+
+const { t } = useT();
 
 const authUser = computed(() => usePage().props.auth?.user ?? null);
 
@@ -25,13 +28,13 @@ function onFileChange(event) {
     }
 
     if (!file.type.startsWith('image/')) {
-        error.value = 'Please choose an image file.';
+        error.value = t('avatar.err_choose');
         event.target.value = '';
         return;
     }
 
     if (file.size > 4 * 1024 * 1024) {
-        error.value = 'Image must be 4 MB or smaller.';
+        error.value = t('avatar.err_size');
         event.target.value = '';
         return;
     }
@@ -55,13 +58,13 @@ function submit() {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: () => reset(),
-        onError: (errors) => { error.value = errors.avatar || 'Could not upload image.'; },
+        onError: (errors) => { error.value = errors.avatar || t('avatar.err_upload'); },
     });
 }
 
 function remove() {
     if (!authUser.value?.avatar_url) return;
-    if (!window.confirm('Remove your profile picture?')) return;
+    if (!window.confirm(t('avatar.confirm_remove'))) return;
     router.delete(route('profile.avatar.destroy'), { preserveScroll: true });
 }
 </script>
@@ -92,7 +95,7 @@ function remove() {
                     @click="pickFile"
                     class="app-button-secondary gap-1.5"
                 >
-                    {{ authUser?.avatar_url ? 'Change picture' : 'Upload picture' }}
+                    {{ authUser?.avatar_url ? t('avatar.change') : t('avatar.upload') }}
                 </button>
 
                 <template v-else>
@@ -102,7 +105,7 @@ function remove() {
                         :disabled="form.processing"
                         class="app-button-primary gap-1.5 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {{ form.processing ? 'Uploading…' : 'Save picture' }}
+                        {{ form.processing ? t('avatar.uploading') : t('avatar.save') }}
                     </button>
                     <button
                         type="button"
@@ -110,7 +113,7 @@ function remove() {
                         :disabled="form.processing"
                         class="app-button-secondary gap-1.5"
                     >
-                        Cancel
+                        {{ t('common.cancel') }}
                     </button>
                 </template>
 
@@ -120,14 +123,12 @@ function remove() {
                     @click="remove"
                     class="app-button-danger gap-1.5"
                 >
-                    Remove
+                    {{ t('common.remove') }}
                 </button>
             </div>
         </div>
 
-        <p class="text-xs text-[var(--slate-soft)]">
-            JPG, PNG, or WebP up to 4 MB. Square images look best.
-        </p>
+        <p class="text-xs text-[var(--slate-soft)]">{{ t('avatar.help') }}</p>
 
         <p v-if="error" class="text-xs font-medium text-rose-600 dark:text-rose-300">{{ error }}</p>
     </div>

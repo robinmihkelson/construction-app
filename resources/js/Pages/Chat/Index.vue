@@ -5,6 +5,9 @@ export default { layout: AuthenticatedLayout }
 
 <script setup>
 import { Link } from '@inertiajs/vue3'
+import { useT } from '@/i18n/useT'
+
+const { t } = useT()
 
 defineProps({ projects: Array })
 
@@ -32,12 +35,12 @@ function initial(name) {
         <!-- Page header -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <div class="app-label">Messaging</div>
-                <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">Chat channels</h1>
-                <p class="mt-1 text-sm text-[var(--slate-soft)]">Project threads, file sharing, and team updates in one place.</p>
+                <div class="app-label">{{ t('chat.label') }}</div>
+                <h1 class="mt-1 text-2xl font-bold text-[var(--ink)]">{{ t('chat.title') }}</h1>
+                <p class="mt-1 text-sm text-[var(--slate-soft)]">{{ t('chat.subtitle') }}</p>
             </div>
             <div class="shrink-0 rounded-xl border border-[var(--line)] bg-[var(--panel-bg)] px-6 py-3 text-center shadow-sm">
-                <div class="app-label">Channels</div>
+                <div class="app-label">{{ t('chat.channels') }}</div>
                 <div class="mt-0.5 text-3xl font-bold text-[var(--ink)]">{{ projects?.length ?? 0 }}</div>
             </div>
         </div>
@@ -53,8 +56,8 @@ function initial(name) {
                     </svg>
                 </div>
                 <div>
-                    <div class="font-semibold text-[var(--ink)]">No channels yet</div>
-                    <div class="mt-1 text-sm text-[var(--slate-soft)]">You are not a member of any projects with chat.</div>
+                    <div class="font-semibold text-[var(--ink)]">{{ t('chat.empty_title') }}</div>
+                    <div class="mt-1 text-sm text-[var(--slate-soft)]">{{ t('chat.empty_desc') }}</div>
                 </div>
             </div>
 
@@ -76,7 +79,7 @@ function initial(name) {
                     <!-- Project info -->
                     <div class="min-w-0 flex-1">
                         <div class="font-semibold text-[var(--ink)]">{{ p.name }}</div>
-                        <div class="mt-0.5 text-xs text-[var(--slate-soft)]">Project channel</div>
+                        <div class="mt-0.5 text-xs text-[var(--slate-soft)]">{{ t('chat.project_channel') }}</div>
                     </div>
 
                     <!-- Unread or open -->
@@ -85,10 +88,10 @@ function initial(name) {
                             v-if="(p.unread_count ?? 0) > 0"
                             class="inline-flex items-center rounded-full bg-[var(--accent)] px-2.5 py-1 text-xs font-bold text-white"
                         >
-                            {{ p.unread_count }} new
+                            {{ p.unread_count }} {{ t('chat.new') }}
                         </span>
                         <span v-else class="flex items-center gap-1 text-xs font-medium text-[var(--slate-soft)] transition group-hover:text-[var(--ink)]">
-                            Open
+                            {{ t('common.open') }}
                             <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                             </svg>
