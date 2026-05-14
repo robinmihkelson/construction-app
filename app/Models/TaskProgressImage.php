@@ -12,6 +12,7 @@ class TaskProgressImage extends Model
         'disk',
         'path',
         'original_name',
+        'caption',
         'mime',
         'size',
     ];

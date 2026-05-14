@@ -87,7 +87,7 @@ function statusBadge(status) {
                         class="shrink-0 rounded-full px-2.5 py-1 text-[0.64rem] font-bold capitalize"
                         :class="statusBadge(project.status)"
                     >
-                        {{ project.status }}
+                        {{ t(`projects.status_${project.status}`) }}
                     </span>
                 </div>
 

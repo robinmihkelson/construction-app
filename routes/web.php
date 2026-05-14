@@ -192,6 +192,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('tasks.comments.destroy');
     Route::post('/tasks/{task}/progress-images', [TaskProgressImageController::class, 'store'])
         ->name('tasks.progress-images.store');
+    Route::patch('/tasks/{task}/progress-images/{image}', [TaskProgressImageController::class, 'update'])
+        ->name('tasks.progress-images.update');
     Route::delete('/tasks/{task}/progress-images/{image}', [TaskProgressImageController::class, 'destroy'])
         ->name('tasks.progress-images.destroy');
     Route::get('/my-tasks', [MyTasksController::class, 'index'])->name('my-tasks.index');

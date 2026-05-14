@@ -5,7 +5,7 @@ export default { layout: AuthenticatedLayout }
 
 <script setup>
 import { useForm, router, Link, usePage } from '@inertiajs/vue3'
-import { computed, nextTick, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, nextTick, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import UserAvatar from '@/Components/UserAvatar.vue'
 import { useT } from '@/i18n/useT'
 
@@ -29,7 +29,7 @@ const props = defineProps({
 const form = useForm({ title: '', assigned_to: '', due_date: '' })
 const memberForm = useForm({ user_id: '', role: '' })
 const taskCommentForm = useForm({ body: '' })
-const progressImageForm = useForm({ images: [] })
+const progressImageForm = useForm({ images: [], captions: [] })
 
 const isBusy = ref(false)
 const selectedTaskId = ref(null)
@@ -48,11 +48,14 @@ onMounted(() => {
     removeFinish = router.on('finish', () => { isBusy.value = false })
     const queryTaskId = Number(new URLSearchParams(window.location.search).get('task'))
     if (props.tasks.some((t) => t.id === queryTaskId)) selectedTaskId.value = queryTaskId
+    window.addEventListener('keydown', onLightboxKeydown)
 })
 
 onBeforeUnmount(() => {
     removeStart && removeStart()
     removeFinish && removeFinish()
+    window.removeEventListener('keydown', onLightboxKeydown)
+    clearPreviews()
 })
 
 function deleteTask(taskId) {
@@ -116,8 +119,30 @@ function submitTaskComment() {
     })
 }
 
+const selectedPreviews = ref([])
+
+function clearPreviews() {
+    for (const p of selectedPreviews.value) URL.revokeObjectURL(p.url)
+    selectedPreviews.value = []
+}
+
 function handleProgressImages(event) {
-    progressImageForm.images = Array.from(event.target.files ?? [])
+    clearPreviews()
+    const files = Array.from(event.target.files ?? [])
+    progressImageForm.images = files
+    progressImageForm.captions = files.map(() => '')
+    selectedPreviews.value = files.map((file) => ({
+        name: file.name,
+        url: URL.createObjectURL(file),
+    }))
+}
+
+function removeSelectedFile(index) {
+    const removed = selectedPreviews.value[index]
+    if (removed) URL.revokeObjectURL(removed.url)
+    selectedPreviews.value.splice(index, 1)
+    progressImageForm.images = progressImageForm.images.filter((_, i) => i !== index)
+    progressImageForm.captions = progressImageForm.captions.filter((_, i) => i !== index)
 }
 
 function uploadProgressImages(event) {
@@ -126,7 +151,8 @@ function uploadProgressImages(event) {
         preserveScroll: true,
         forceFormData: true,
         onSuccess: () => {
-            progressImageForm.reset('images')
+            progressImageForm.reset('images', 'captions')
+            clearPreviews()
             event.target.reset()
         },
     })
@@ -138,6 +164,160 @@ function deleteProgressImage(imageId) {
     router.delete(route('tasks.progress-images.destroy', [selectedTask.value.id, imageId]), { preserveScroll: true })
 }
 
+// --- Progress photo browsing (grouped grid + lightbox) ---
+
+const localeCode = computed(() => {
+    const loc = page.props.locale ?? 'et'
+    if (loc === 'et') return 'et-EE'
+    if (loc === 'fi') return 'fi-FI'
+    return 'en-US'
+})
+
+function dayKey(iso) {
+    const d = new Date(iso)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function dayLabel(iso) {
+    const d = new Date(iso)
+    return new Intl.DateTimeFormat(localeCode.value, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric',
+    }).format(d)
+}
+
+const flatProgressImages = computed(() => {
+    const images = selectedTask.value?.progress_images ?? []
+    return [...images].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+})
+
+const groupedProgressImages = computed(() => {
+    const groups = []
+    const byKey = new Map()
+    for (const img of flatProgressImages.value) {
+        const key = dayKey(img.created_at)
+        let group = byKey.get(key)
+        if (!group) {
+            group = { key, label: dayLabel(img.created_at), photos: [] }
+            byKey.set(key, group)
+            groups.push(group)
+        }
+        group.photos.push(img)
+    }
+    return groups
+})
+
+const lightboxIndex = ref(null)
+const lightboxImage = computed(() =>
+    lightboxIndex.value === null ? null : flatProgressImages.value[lightboxIndex.value] ?? null
+)
+
+const editingCaption = ref({ id: null, value: '' })
+const isSavingCaption = ref(false)
+
+function canEditImage(image) {
+    if (!image) return false
+    return isCurrentUser(image.user?.id) || !!props.can?.manageTasks
+}
+
+function startCaptionEdit(image) {
+    if (!canEditImage(image)) return
+    editingCaption.value = { id: image.id, value: image.caption ?? '' }
+}
+
+function cancelCaptionEdit() {
+    editingCaption.value = { id: null, value: '' }
+}
+
+function saveCaptionEdit() {
+    if (editingCaption.value.id === null || !selectedTask.value) return
+    const imageId = editingCaption.value.id
+    const caption = editingCaption.value.value.trim()
+    isSavingCaption.value = true
+    router.patch(
+        route('tasks.progress-images.update', [selectedTask.value.id, imageId]),
+        { caption },
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                isSavingCaption.value = false
+            },
+            onSuccess: () => {
+                editingCaption.value = { id: null, value: '' }
+            },
+        },
+    )
+}
+
+function openLightbox(image) {
+    const idx = flatProgressImages.value.findIndex((i) => i.id === image.id)
+    if (idx < 0) return
+    lightboxIndex.value = idx
+}
+
+function closeLightbox() {
+    lightboxIndex.value = null
+    cancelCaptionEdit()
+}
+
+function nextPhoto() {
+    if (lightboxIndex.value === null) return
+    const total = flatProgressImages.value.length
+    if (total === 0) {
+        lightboxIndex.value = null
+        return
+    }
+    lightboxIndex.value = (lightboxIndex.value + 1) % total
+}
+
+function prevPhoto() {
+    if (lightboxIndex.value === null) return
+    const total = flatProgressImages.value.length
+    if (total === 0) {
+        lightboxIndex.value = null
+        return
+    }
+    lightboxIndex.value = (lightboxIndex.value - 1 + total) % total
+}
+
+watch(flatProgressImages, (curr) => {
+    if (lightboxIndex.value === null) return
+    if (curr.length === 0) {
+        lightboxIndex.value = null
+        return
+    }
+    if (lightboxIndex.value >= curr.length) {
+        lightboxIndex.value = curr.length - 1
+    }
+})
+
+watch(lightboxIndex, () => {
+    cancelCaptionEdit()
+})
+
+function onLightboxKeydown(event) {
+    if (lightboxIndex.value === null) return
+    if (event.key === 'Escape') closeLightbox()
+    else if (event.key === 'ArrowRight') nextPhoto()
+    else if (event.key === 'ArrowLeft') prevPhoto()
+}
+
+let touchStartX = null
+function onLightboxTouchStart(event) {
+    touchStartX = event.touches[0]?.clientX ?? null
+}
+function onLightboxTouchEnd(event) {
+    if (touchStartX === null) return
+    const endX = event.changedTouches[0]?.clientX ?? touchStartX
+    const dx = endX - touchStartX
+    touchStartX = null
+    if (Math.abs(dx) < 40) return
+    if (dx < 0) nextPhoto()
+    else prevPhoto()
+}
+
 function removeMember(memberId) {
     if (!window.confirm(t('projects.confirm_remove_member'))) return
     router.delete(route('projects.members.destroy', [props.project.id, memberId]), { preserveScroll: true })
@@ -147,6 +327,17 @@ function deleteComment(commentId) {
     if (!selectedTask.value) return
     if (!window.confirm(t('projects.confirm_delete_comment'))) return
     router.delete(route('tasks.comments.destroy', [selectedTask.value.id, commentId]), { preserveScroll: true })
+}
+
+const PROJECT_STATUSES = ['active', 'on_hold', 'completed']
+
+function projectStatusLabel(status) {
+    return t(`projects.status_${status}`)
+}
+
+function updateProjectStatus(status) {
+    if (status === props.project.status) return
+    router.patch(route('projects.update', props.project.id), { status }, { preserveScroll: true })
 }
 
 const isRenaming = ref(false)
@@ -300,6 +491,20 @@ function saveRename() {
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
+                    <label v-if="can?.editProject" class="flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-1.5 text-xs font-semibold text-[var(--slate)]">
+                        <span class="text-[var(--slate-soft)]">{{ t('projects.status_label') }}:</span>
+                        <select
+                            :value="project.status"
+                            :disabled="isBusy"
+                            @change="updateProjectStatus($event.target.value)"
+                            class="cursor-pointer bg-transparent text-xs font-semibold capitalize text-[var(--ink)] outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <option v-for="s in PROJECT_STATUSES" :key="s" :value="s">{{ projectStatusLabel(s) }}</option>
+                        </select>
+                    </label>
+                    <span v-else class="app-panel-muted px-3 py-2 text-xs font-semibold capitalize text-[var(--slate-soft)]">
+                        {{ projectStatusLabel(project.status) }}
+                    </span>
                     <span class="app-panel-muted px-3 py-2 text-xs font-semibold text-[var(--slate-soft)]">
                         {{ tasks.length }} {{ t('projects.tasks') }}
                     </span>
@@ -651,6 +856,34 @@ function saveRename() {
                                         @change="handleProgressImages"
                                         class="block w-full rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2 text-xs text-[var(--ink)] file:mr-3 file:rounded-md file:border-0 file:bg-[var(--accent)] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
                                     />
+
+                                    <div v-if="selectedPreviews.length" class="space-y-2">
+                                        <div
+                                            v-for="(preview, idx) in selectedPreviews"
+                                            :key="preview.url"
+                                            class="flex items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--panel-strong)] p-1.5"
+                                        >
+                                            <div class="relative h-14 w-14 shrink-0 overflow-hidden rounded">
+                                                <img :src="preview.url" :alt="preview.name" class="h-full w-full object-cover" />
+                                            </div>
+                                            <input
+                                                v-model="progressImageForm.captions[idx]"
+                                                type="text"
+                                                maxlength="500"
+                                                :placeholder="t('projects.caption_placeholder')"
+                                                class="min-w-0 flex-1 rounded bg-transparent px-1 py-1 text-xs text-[var(--ink)] outline-none placeholder:text-[var(--slate-soft)] focus:bg-[var(--panel-bg)]"
+                                            />
+                                            <button
+                                                type="button"
+                                                @click="removeSelectedFile(idx)"
+                                                class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[var(--slate-soft)] transition hover:bg-[var(--panel-bg)] hover:text-rose-600"
+                                                :aria-label="t('common.remove')"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     <button
                                         type="submit"
                                         :disabled="progressImageForm.processing || progressImageForm.images.length === 0"
@@ -660,32 +893,54 @@ function saveRename() {
                                     </button>
                                 </form>
 
-                                <div v-if="(selectedTask.progress_images?.length ?? 0) === 0" class="mt-4 rounded-lg border border-dashed border-[var(--line)] px-3 py-6 text-center text-xs text-[var(--slate-soft)]">
+                                <div v-if="flatProgressImages.length === 0" class="mt-4 rounded-lg border border-dashed border-[var(--line)] px-3 py-6 text-center text-xs text-[var(--slate-soft)]">
                                     {{ t('projects.no_photos') }}
                                 </div>
 
-                                <div v-else class="mt-4 grid gap-3 sm:grid-cols-2">
-                                    <figure
-                                        v-for="image in selectedTask.progress_images"
-                                        :key="image.id"
-                                        class="overflow-hidden rounded-lg border border-[var(--line)] bg-white"
-                                    >
-                                        <a :href="image.url" target="_blank" rel="noreferrer">
-                                            <img :src="image.url" :alt="image.original_name" class="h-32 w-full object-cover transition hover:opacity-90" />
-                                        </a>
-                                        <figcaption class="space-y-1.5 px-3 py-2.5 text-xs text-[var(--slate-soft)]">
-                                            <div class="truncate font-medium text-[var(--ink)]">{{ image.original_name }}</div>
-                                            <div>{{ image.user?.name ?? t('common.unknown') }} · {{ new Date(image.created_at).toLocaleDateString() }}</div>
-                                            <button
-                                                v-if="isCurrentUser(image.user?.id) || can.manageTasks"
-                                                type="button"
-                                                @click="deleteProgressImage(image.id)"
-                                                class="font-semibold text-rose-600 transition hover:text-rose-800"
+                                <div v-else class="mt-4 space-y-4">
+                                    <div v-for="group in groupedProgressImages" :key="group.key">
+                                        <div class="mb-2 flex items-center justify-between text-[0.65rem] font-bold uppercase tracking-wide text-[var(--slate-soft)]">
+                                            <span>{{ group.label }}</span>
+                                            <span>{{ group.photos.length }}</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                                            <div
+                                                v-for="image in group.photos"
+                                                :key="image.id"
+                                                class="group relative aspect-square overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--panel-strong)]"
+                                                :title="image.original_name"
                                             >
-                                                {{ t('common.delete') }}
-                                            </button>
-                                        </figcaption>
-                                    </figure>
+                                                <button
+                                                    type="button"
+                                                    @click="openLightbox(image)"
+                                                    class="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                                                >
+                                                    <img
+                                                        :src="image.url"
+                                                        :alt="image.original_name"
+                                                        loading="lazy"
+                                                        class="h-full w-full object-cover transition duration-200 group-hover:scale-[1.03]"
+                                                    />
+                                                </button>
+                                                <div v-if="image.caption" class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/55 to-transparent px-2 pb-1.5 pt-6 text-[0.7rem] font-medium text-white">
+                                                    <div class="line-clamp-2 leading-snug">{{ image.caption }}</div>
+                                                </div>
+                                                <div v-else class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent px-2 pb-1.5 pt-6 text-[0.65rem] font-medium text-white opacity-0 transition group-hover:opacity-100">
+                                                    <div class="truncate">{{ image.user?.name ?? t('common.unknown') }}</div>
+                                                    <div class="text-slate-300">{{ new Date(image.created_at).toLocaleDateString() }}</div>
+                                                </div>
+                                                <button
+                                                    v-if="isCurrentUser(image.user?.id) || can.manageTasks"
+                                                    type="button"
+                                                    @click.stop="deleteProgressImage(image.id)"
+                                                    class="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-slate-950/70 text-sm font-bold text-white opacity-0 transition hover:bg-rose-600 group-hover:opacity-100 focus:opacity-100"
+                                                    :aria-label="t('common.delete')"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -752,4 +1007,123 @@ function saveRename() {
             </div>
         </div>
     </div>
+
+    <Teleport to="body">
+        <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div
+                v-if="lightboxImage"
+                class="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/92 p-4 backdrop-blur-sm"
+                role="dialog"
+                aria-modal="true"
+                @click.self="closeLightbox"
+                @touchstart="onLightboxTouchStart"
+                @touchend="onLightboxTouchEnd"
+            >
+                <button
+                    type="button"
+                    @click="closeLightbox"
+                    class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-2xl font-bold text-white transition hover:bg-white/20"
+                    :aria-label="t('common.close')"
+                >
+                    ×
+                </button>
+
+                <button
+                    v-if="flatProgressImages.length > 1"
+                    type="button"
+                    @click="prevPhoto"
+                    class="absolute left-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-xl font-bold text-white transition hover:bg-white/20 md:flex"
+                    :aria-label="t('common.previous')"
+                >
+                    ‹
+                </button>
+
+                <button
+                    v-if="flatProgressImages.length > 1"
+                    type="button"
+                    @click="nextPhoto"
+                    class="absolute right-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-xl font-bold text-white transition hover:bg-white/20 md:flex"
+                    :aria-label="t('common.next')"
+                >
+                    ›
+                </button>
+
+                <figure class="flex max-h-full w-full max-w-5xl flex-col items-center" @click.stop>
+                    <img
+                        :src="lightboxImage.url"
+                        :alt="lightboxImage.original_name"
+                        class="max-h-[72vh] max-w-full select-none rounded-lg object-contain shadow-2xl"
+                        draggable="false"
+                    />
+
+                    <div class="mt-4 w-full max-w-2xl space-y-3 rounded-xl border border-white/10 bg-slate-950/85 px-5 py-4 text-center shadow-lg backdrop-blur-md">
+                        <div>
+                            <template v-if="editingCaption.id === lightboxImage.id">
+                                <input
+                                    v-model="editingCaption.value"
+                                    type="text"
+                                    maxlength="500"
+                                    :placeholder="t('projects.caption_placeholder')"
+                                    :disabled="isSavingCaption"
+                                    @keydown.enter.prevent="saveCaptionEdit"
+                                    @keydown.esc.prevent="cancelCaptionEdit"
+                                    class="w-full rounded-lg border border-white/30 bg-slate-900 px-3 py-2 text-sm text-white outline-none placeholder:text-slate-400 focus:border-[var(--accent)] disabled:opacity-50"
+                                />
+                                <div class="mt-2 flex justify-center gap-2">
+                                    <button
+                                        type="button"
+                                        @click="saveCaptionEdit"
+                                        :disabled="isSavingCaption"
+                                        class="rounded-md bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[var(--accent-deep)] disabled:opacity-50"
+                                    >
+                                        {{ isSavingCaption ? t('common.saving') : t('common.save') }}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="cancelCaptionEdit"
+                                        :disabled="isSavingCaption"
+                                        class="rounded-md border border-white/30 bg-slate-800 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
+                                    >
+                                        {{ t('common.cancel') }}
+                                    </button>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <p
+                                    v-if="lightboxImage.caption"
+                                    class="whitespace-pre-wrap break-words text-sm font-medium leading-6 text-white"
+                                >
+                                    {{ lightboxImage.caption }}
+                                </p>
+                                <button
+                                    v-if="canEditImage(lightboxImage)"
+                                    type="button"
+                                    @click="startCaptionEdit(lightboxImage)"
+                                    :class="lightboxImage.caption ? 'mt-2' : ''"
+                                    class="text-xs font-semibold text-slate-200 underline-offset-2 transition hover:text-white hover:underline"
+                                >
+                                    {{ lightboxImage.caption ? t('common.edit') : t('projects.add_caption') }}
+                                </button>
+                            </template>
+                        </div>
+
+                        <figcaption class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-white/10 pt-3 text-xs text-white">
+                            <span class="font-semibold">{{ lightboxImage.user?.name ?? t('common.unknown') }}</span>
+                            <span class="text-slate-300">{{ new Date(lightboxImage.created_at).toLocaleString() }}</span>
+                            <span v-if="flatProgressImages.length > 1" class="rounded-full bg-white/10 px-2 py-0.5 text-[0.7rem] font-semibold text-slate-200">
+                                {{ lightboxIndex + 1 }} / {{ flatProgressImages.length }}
+                            </span>
+                        </figcaption>
+                    </div>
+                </figure>
+            </div>
+        </Transition>
+    </Teleport>
 </template>

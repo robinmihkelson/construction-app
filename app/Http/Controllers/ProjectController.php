@@ -89,6 +89,7 @@ class ProjectController extends Controller
                     'id' => $image->id,
                     'url' => Storage::disk($image->disk)->url($image->path),
                     'original_name' => $image->original_name,
+                    'caption' => $image->caption,
                     'created_at' => optional($image->created_at)->toISOString(),
                     'user' => $image->user ? [
                         'id' => $image->user->id,
