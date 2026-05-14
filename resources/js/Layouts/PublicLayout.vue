@@ -214,7 +214,6 @@ watch(pageUrl, () => {
 
         <div class="hidden shrink-0 items-center gap-2 xl:flex">
           <div class="flex items-center gap-1 rounded-2xl border border-slate-300 bg-white px-1.5 py-1.5">
-            <span class="hidden px-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500 2xl:inline">{{ t('locale_label') }}</span>
             <button
               v-for="item in locales"
               :key="item.code"

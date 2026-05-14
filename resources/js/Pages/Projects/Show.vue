@@ -138,6 +138,17 @@ function deleteProgressImage(imageId) {
     router.delete(route('tasks.progress-images.destroy', [selectedTask.value.id, imageId]), { preserveScroll: true })
 }
 
+function removeMember(memberId) {
+    if (!window.confirm(t('projects.confirm_remove_member'))) return
+    router.delete(route('projects.members.destroy', [props.project.id, memberId]), { preserveScroll: true })
+}
+
+function deleteComment(commentId) {
+    if (!selectedTask.value) return
+    if (!window.confirm(t('projects.confirm_delete_comment'))) return
+    router.delete(route('tasks.comments.destroy', [selectedTask.value.id, commentId]), { preserveScroll: true })
+}
+
 const isRenaming = ref(false)
 const renameValue = ref('')
 const renameError = ref('')
@@ -388,6 +399,7 @@ function saveRename() {
                                         :name="m.name"
                                         :seed="m.id"
                                         :size="28"
+                                        :accent="isCurrentUser(m.id)"
                                     />
                                     <div class="min-w-0">
                                         <div class="truncate text-xs font-semibold text-[var(--ink)]">{{ m.name }}</div>
@@ -400,10 +412,7 @@ function saveRename() {
                                 <button
                                     v-else-if="can.manageMembers"
                                     type="button"
-                                    @click.prevent.stop="
-                                        window.confirm(t('projects.confirm_remove_member')) &&
-                                        router.delete(route('projects.members.destroy', [project.id, m.id]), { preserveScroll: true })
-                                    "
+                                    @click.prevent.stop="removeMember(m.id)"
                                     class="shrink-0 text-[0.64rem] font-semibold text-rose-600 transition hover:text-rose-800"
                                 >
                                     {{ t('common.remove') }}
@@ -502,11 +511,6 @@ function saveRename() {
 
                 <div class="app-panel overflow-hidden">
                     <div v-if="!selectedTask" class="flex flex-col items-center gap-3 px-5 py-12 text-center">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--panel-muted)]">
-                            <svg class="h-5 w-5 text-[var(--slate-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
-                            </svg>
-                        </div>
                         <div class="text-sm text-[var(--slate-soft)]">{{ t('projects.task_details_empty') }}</div>
                     </div>
 
@@ -710,23 +714,34 @@ function saveRename() {
 
                                 <div v-else class="mt-5 divide-y divide-[var(--line)] border-t border-[var(--line)]">
                                     <div v-for="c in selectedTask.comments" :key="c.id" class="py-4">
-                                        <div class="mb-2 flex items-start justify-between gap-3">
-                                            <div class="min-w-0">
-                                                <span class="text-xs font-semibold text-[var(--ink)]">{{ c.user?.name ?? t('common.unknown') }}</span>
-                                                <span v-if="isCurrentUser(c.user?.id)" class="ml-1 text-[0.65rem] font-bold text-[var(--accent)]">{{ t('common.you_inline') }}</span>
-                                                <div class="text-[0.65rem] text-[var(--slate-soft)]">{{ new Date(c.created_at).toLocaleString() }}</div>
+                                        <div class="flex items-start gap-3">
+                                            <UserAvatar
+                                                :url="c.user?.avatar_url ?? null"
+                                                :name="c.user?.name ?? ''"
+                                                :seed="c.user?.id"
+                                                :size="32"
+                                                :accent="isCurrentUser(c.user?.id)"
+                                            />
+                                            <div class="min-w-0 flex-1">
+                                                <div class="mb-2 flex items-start justify-between gap-3">
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-[var(--ink)]">{{ c.user?.name ?? t('common.unknown') }}</span>
+                                                        <span v-if="isCurrentUser(c.user?.id)" class="ml-1 text-[0.65rem] font-bold text-[var(--accent)]">{{ t('common.you_inline') }}</span>
+                                                        <div class="text-[0.65rem] text-[var(--slate-soft)]">{{ new Date(c.created_at).toLocaleString() }}</div>
+                                                    </div>
+                                                    <button
+                                                        v-if="isCurrentUser(c.user?.id)"
+                                                        type="button"
+                                                        :disabled="isBusy"
+                                                        @click="deleteComment(c.id)"
+                                                        class="shrink-0 text-xs font-semibold text-rose-600 transition hover:text-rose-800 disabled:opacity-50"
+                                                    >
+                                                        {{ t('common.delete') }}
+                                                    </button>
+                                                </div>
+                                                <div class="whitespace-pre-wrap break-words text-sm leading-6 text-[var(--ink)] [overflow-wrap:anywhere]">{{ c.body }}</div>
                                             </div>
-                                            <button
-                                                v-if="isCurrentUser(c.user?.id)"
-                                                type="button"
-                                                :disabled="isBusy"
-                                                @click="window.confirm(t('projects.confirm_delete_comment')) && router.delete(route('tasks.comments.destroy', [selectedTask.id, c.id]), { preserveScroll: true })"
-                                                class="shrink-0 text-xs font-semibold text-rose-600 transition hover:text-rose-800 disabled:opacity-50"
-                                            >
-                                                {{ t('common.delete') }}
-                                            </button>
                                         </div>
-                                        <div class="whitespace-pre-wrap break-words text-sm leading-6 text-[var(--ink)] [overflow-wrap:anywhere]">{{ c.body }}</div>
                                     </div>
                                 </div>
                             </div>
