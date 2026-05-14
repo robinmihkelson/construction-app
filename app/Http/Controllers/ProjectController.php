@@ -113,6 +113,7 @@ class ProjectController extends Controller
                 ->wherePivot('role', 'office')
                 ->exists(),
             'editProject' => Gate::allows('update', $project),
+            'deleteProject' => Gate::allows('delete', $project),
         ],
     ]);
     }
@@ -289,7 +290,7 @@ class ProjectController extends Controller
     }
 
     public function update(Request $request, Project $project)
-    {   
+    {
     $this->authorize('update', $project);
 
     $data = $request->validate([
@@ -300,6 +301,30 @@ class ProjectController extends Controller
     $project->update($data);
 
     return back()->with('success', 'Project updated.');
+    }
+
+    public function destroy(Project $project)
+    {
+        $this->authorize('delete', $project);
+
+        // Remove physical files (DB cascade only deletes rows).
+        $project->load('tasks.progressImages', 'messages.attachments');
+
+        foreach ($project->tasks as $task) {
+            foreach ($task->progressImages as $image) {
+                Storage::disk($image->disk)->delete($image->path);
+            }
+        }
+
+        foreach ($project->messages as $message) {
+            foreach ($message->attachments as $attachment) {
+                Storage::disk($attachment->disk)->delete($attachment->path);
+            }
+        }
+
+        $project->delete();
+
+        return redirect()->route('projects.index')->with('success', 'Project deleted.');
     }
 
 

@@ -340,6 +340,11 @@ function updateProjectStatus(status) {
     router.patch(route('projects.update', props.project.id), { status }, { preserveScroll: true })
 }
 
+function deleteProject() {
+    if (!window.confirm(t('projects.confirm_delete_project'))) return
+    router.delete(route('projects.destroy', props.project.id))
+}
+
 const isRenaming = ref(false)
 const renameValue = ref('')
 const renameError = ref('')
@@ -517,6 +522,19 @@ function saveRename() {
                         </svg>
                         {{ t('projects.title') }}
                     </Link>
+                    <button
+                        v-if="can?.deleteProject"
+                        type="button"
+                        @click="deleteProject"
+                        :disabled="isBusy"
+                        class="app-button-danger gap-1.5 disabled:opacity-50"
+                        :title="t('projects.delete_project')"
+                    >
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" />
+                        </svg>
+                        {{ t('projects.delete_project') }}
+                    </button>
                 </div>
             </div>
 
