@@ -242,31 +242,15 @@
         100% { background-position: -200% 0; }
     }
 
-    /* ── Public site reveal animations ──────────────────── */
+    /* ── Public site reveals ───────────────────────────── */
+    /*
+     * Hidden initial state guards against FOUC before GSAP boots.
+     * GSAP (useReveals.js) reads [data-reveal] elements and animates
+     * them into view — it owns the transition timing and easing.
+     */
     [data-reveal] {
         opacity: 0;
-        transform: translate3d(0, 24px, 0) scale(0.985);
-        filter: blur(2px);
-        clip-path: inset(0 0 0 0);
-        transition-property: opacity, transform, filter, clip-path;
-        transition-duration: var(--reveal-duration, 760ms);
-        transition-timing-function: cubic-bezier(0.2, 0.9, 0.2, 1);
-        transition-delay: var(--reveal-delay, 0ms);
         will-change: transform, opacity;
-    }
-
-    [data-reveal="rise"]       { transform: translate3d(0, 26px, 0) scale(0.985); }
-    [data-reveal="slide-right"]{ transform: translate3d(-34px, 16px, 0) scale(0.99); }
-    [data-reveal="slide-left"] { transform: translate3d(34px, 16px, 0) scale(0.99); }
-    [data-reveal="zoom-in"]    { transform: translate3d(0, 20px, 0) scale(0.9); }
-    [data-reveal="card"]       { transform: translate3d(0, 30px, 0) scale(0.96) rotateX(6deg); transform-origin: center bottom; }
-    [data-reveal="curtain"]    { clip-path: inset(0 0 100% 0); transform: translate3d(0, 10px, 0); }
-
-    [data-reveal].is-visible {
-        opacity: 1;
-        transform: translate3d(0, 0, 0) scale(1) rotateX(0deg);
-        filter: blur(0);
-        clip-path: inset(0 0 0 0);
     }
 
     .public-scroll-progress { transform-origin: left center; }
@@ -278,7 +262,6 @@
         transform: none !important;
         filter: none !important;
         clip-path: inset(0 0 0 0) !important;
-        transition: none !important;
     }
     .public-scroll-progress { display: none; }
     .skeleton { animation: none; }

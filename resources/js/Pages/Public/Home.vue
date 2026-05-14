@@ -2,6 +2,9 @@
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { SplitText } from 'gsap/SplitText'
 
 const CONTENT = {
   et: {
@@ -191,52 +194,133 @@ const locale = computed(() => page.props.locale ?? 'et')
 const copy = computed(() => CONTENT[locale.value] ?? CONTENT.et)
 
 const faqOpen = ref(0)
-let statsObserver = null
+const heroRootRef = ref(null)
+const heroTitleRef = ref(null)
+const heroStackRef = ref(null)
+const primaryCtaRef = ref(null)
+
+let ctx = null
+const magneticCleanups = []
 
 function toggleFaq(index) {
   faqOpen.value = faqOpen.value === index ? -1 : index
 }
 
-function countUp(el, to, duration = 900) {
-  const start = performance.now()
-  const formatter = new Intl.NumberFormat(locale.value === 'et' ? 'et-EE' : locale.value === 'fi' ? 'fi-FI' : 'en-US')
+function attachMagnetic(btn) {
+  if (!btn) return
+  const setX = gsap.quickTo(btn, 'x', { duration: 0.5, ease: 'power3.out' })
+  const setY = gsap.quickTo(btn, 'y', { duration: 0.5, ease: 'power3.out' })
 
-  function tick(now) {
-    const progress = Math.min(1, (now - start) / duration)
-    const eased = progress < 1 ? 1 - Math.pow(1 - progress, 3) : 1
-    el.textContent = formatter.format(Math.round(to * eased))
-    if (progress < 1) requestAnimationFrame(tick)
+  const onMove = (e) => {
+    const r = btn.getBoundingClientRect()
+    setX((e.clientX - r.left - r.width / 2) * 0.25)
+    setY((e.clientY - r.top - r.height / 2) * 0.4)
+  }
+  const onLeave = () => {
+    setX(0)
+    setY(0)
   }
 
-  requestAnimationFrame(tick)
+  btn.addEventListener('mousemove', onMove)
+  btn.addEventListener('mouseleave', onLeave)
+  magneticCleanups.push(() => {
+    btn.removeEventListener('mousemove', onMove)
+    btn.removeEventListener('mouseleave', onLeave)
+  })
+}
+
+function localeIntl(code) {
+  return code === 'et' ? 'et-EE' : code === 'fi' ? 'fi-FI' : 'en-US'
 }
 
 onMounted(() => {
-  const stats = document.querySelectorAll('[data-count]')
-  statsObserver = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue
+  if (typeof window === 'undefined') return
 
-        const total = Number(entry.target.getAttribute('data-count') || '0')
-        countUp(entry.target, total)
-        statsObserver.unobserve(entry.target)
-      }
-    },
-    { threshold: 0.35 }
-  )
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  stats.forEach((stat) => statsObserver.observe(stat))
+  ctx = gsap.context(() => {
+    // Hero title — character-by-character lift
+    if (!prefersReduced && heroTitleRef.value) {
+      const split = new SplitText(heroTitleRef.value, { type: 'chars,words', charsClass: 'gsap-char' })
+      gsap.from(split.chars, {
+        yPercent: 110,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power4.out',
+        stagger: 0.018,
+        delay: 0.05,
+      })
+    }
+
+    // Stats count-up driven by ScrollTrigger
+    const formatter = new Intl.NumberFormat(localeIntl(locale.value))
+    document.querySelectorAll('[data-count]').forEach((el) => {
+      const target = Number(el.getAttribute('data-count') || '0')
+      if (!Number.isFinite(target) || target <= 0) return
+
+      const proxy = { val: 0 }
+      gsap.to(proxy, {
+        val: target,
+        duration: 1.3,
+        ease: 'power2.out',
+        onUpdate: () => {
+          el.textContent = formatter.format(Math.round(proxy.val))
+        },
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 90%',
+          once: true,
+        },
+      })
+    })
+
+    // Subtle parallax on hero right-hand card stack
+    if (!prefersReduced && heroStackRef.value) {
+      gsap.to(heroStackRef.value, {
+        yPercent: -6,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: heroRootRef.value,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 0.6,
+        },
+      })
+    }
+
+    // Magnetic primary CTA — Inertia Link returns the component instance, unwrap to $el
+    if (!prefersReduced) {
+      const ctaEl = primaryCtaRef.value?.$el ?? primaryCtaRef.value
+      attachMagnetic(ctaEl)
+    }
+
+    // Card hover lift via quickTo (services, portfolio teaser, FAQ panel)
+    if (!prefersReduced) {
+      document.querySelectorAll('[data-hover-lift]').forEach((card) => {
+        const setY = gsap.quickTo(card, 'y', { duration: 0.35, ease: 'power3.out' })
+        const onEnter = () => setY(-6)
+        const onLeave = () => setY(0)
+        card.addEventListener('mouseenter', onEnter)
+        card.addEventListener('mouseleave', onLeave)
+        magneticCleanups.push(() => {
+          card.removeEventListener('mouseenter', onEnter)
+          card.removeEventListener('mouseleave', onLeave)
+        })
+      })
+    }
+  }, heroRootRef.value)
 })
 
 onBeforeUnmount(() => {
-  if (statsObserver) statsObserver.disconnect()
+  magneticCleanups.forEach((fn) => fn())
+  magneticCleanups.length = 0
+  if (ctx) ctx.revert()
 })
 </script>
 
 <template>
   <PublicLayout>
-    <section data-nav-logo-tone="inverse" class="relative overflow-hidden border-b border-slate-800">
+    <section ref="heroRootRef" data-nav-logo-tone="inverse" class="relative overflow-hidden border-b border-slate-800">
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(251,191,36,0.18),transparent_22%),linear-gradient(115deg,rgba(2,6,23,0.95),rgba(15,23,42,0.84)_55%,rgba(30,41,59,0.74))]"></div>
       <div class="absolute inset-y-0 right-0 hidden w-[22%] bg-amber-400/90 lg:block"></div>
       <div class="relative mx-auto max-w-[92rem] px-4 py-16 md:py-24 xl:px-6">
@@ -252,9 +336,8 @@ onBeforeUnmount(() => {
             </div>
 
             <h1
-              data-reveal="rise"
-              style="--reveal-delay: 120ms"
-              class="mt-6 max-w-4xl text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[1.02] text-balance"
+              ref="heroTitleRef"
+              class="mt-6 max-w-4xl overflow-hidden text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[1.02] text-balance"
             >
               {{ copy.heroTitle }}
             </h1>
@@ -269,8 +352,9 @@ onBeforeUnmount(() => {
 
             <div data-reveal="rise" style="--reveal-delay: 260ms" class="mt-8 flex flex-wrap gap-3">
               <Link
+                ref="primaryCtaRef"
                 href="/contact"
-                class="inline-flex items-center bg-amber-400 px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-slate-950 shadow-sm transition hover:bg-amber-300"
+                class="inline-flex items-center bg-amber-400 px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-slate-950 shadow-sm transition will-change-transform hover:bg-amber-300"
               >
                 {{ copy.primaryCta }}
               </Link>
@@ -290,7 +374,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div data-reveal="slide-left" style="--reveal-delay: 160ms" class="grid gap-4">
+          <div ref="heroStackRef" data-reveal="slide-left" style="--reveal-delay: 160ms" class="grid gap-4 will-change-transform">
             <div class="relative min-h-[22rem] overflow-hidden border border-slate-200/90 bg-[linear-gradient(160deg,#ffffff,#f8fafc)] p-6 shadow-[0_20px_40px_rgba(15,23,42,0.2)]">
 
               <div class="relative">
@@ -348,8 +432,9 @@ onBeforeUnmount(() => {
             v-for="(service, index) in copy.services"
             :key="service.title"
             data-reveal="card"
+            data-hover-lift
             :style="{ '--reveal-delay': `${100 + index * 90}ms` }"
-            class="relative overflow-hidden border border-slate-200 bg-white p-6 shadow-[0_16px_32px_rgba(15,23,42,0.04)] transition hover:-translate-y-1 hover:shadow-[0_22px_44px_rgba(15,23,42,0.08)]"
+            class="relative overflow-hidden border border-slate-200 bg-white p-6 shadow-[0_16px_32px_rgba(15,23,42,0.04)] transition-shadow duration-300 will-change-transform hover:shadow-[0_22px_44px_rgba(15,23,42,0.08)]"
           >
             <div class="absolute right-4 top-3 text-6xl font-semibold leading-none text-slate-100">
               0{{ index + 1 }}
@@ -382,15 +467,16 @@ onBeforeUnmount(() => {
             v-for="(card, index) in copy.proofCards"
             :key="card.title"
             data-reveal="card"
+            data-hover-lift
             :style="{ '--reveal-delay': `${140 + index * 95}ms` }"
-            class="group overflow-hidden border border-slate-200 bg-white shadow-[0_16px_32px_rgba(15,23,42,0.04)]"
+            class="group overflow-hidden border border-slate-200 bg-white shadow-[0_16px_32px_rgba(15,23,42,0.04)] transition-shadow duration-300 will-change-transform hover:shadow-[0_22px_44px_rgba(15,23,42,0.08)]"
           >
-            <div class="relative h-44 bg-[linear-gradient(140deg,#1e293b,#334155)]">
+            <div class="relative h-44 overflow-hidden bg-[linear-gradient(140deg,#1e293b,#334155)]">
               <img
                 v-if="card.image"
                 :src="card.image"
                 :alt="card.title"
-                class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                class="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
               />
               <div class="absolute inset-x-0 top-0 h-2 bg-amber-400"></div>
             </div>

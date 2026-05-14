@@ -2,6 +2,8 @@
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import { usePage } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { gsap } from 'gsap'
+import { attachHoverLift } from '@/composables/useHover'
 
 const CONTENT = {
   et: {
@@ -223,21 +225,61 @@ function onKeydown(event) {
   if (event.key === 'Escape') closeProject()
 }
 
+const rootRef = ref(null)
+const cleanups = []
+
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
+  cleanups.push(attachHoverLift(rootRef.value ?? document))
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
+  cleanups.forEach((fn) => fn())
+  cleanups.length = 0
 })
+
+function prefersReducedMotion() {
+  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+function onModalEnter(el, done) {
+  if (prefersReducedMotion()) {
+    done()
+    return
+  }
+  const panel = el.querySelector('[data-modal-panel]')
+  const tl = gsap.timeline({ onComplete: done })
+  tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.25, ease: 'power2.out' })
+  if (panel) {
+    tl.fromTo(
+      panel,
+      { y: 24, opacity: 0, scale: 0.98 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.45, ease: 'power3.out' },
+      '<'
+    )
+  }
+}
+
+function onModalLeave(el, done) {
+  if (prefersReducedMotion()) {
+    done()
+    return
+  }
+  const panel = el.querySelector('[data-modal-panel]')
+  const tl = gsap.timeline({ onComplete: done })
+  if (panel) {
+    tl.to(panel, { y: 12, opacity: 0, scale: 0.99, duration: 0.22, ease: 'power2.in' })
+  }
+  tl.to(el, { opacity: 0, duration: 0.2, ease: 'power2.in' }, '<0.05')
+}
 </script>
 
 <template>
   <PublicLayout>
-    <section class="mx-auto max-w-[92rem] px-4 py-14 xl:px-6">
+    <section ref="rootRef" class="mx-auto max-w-[92rem] px-4 py-14 xl:px-6">
       <div data-nav-logo-tone="inverse" data-reveal="curtain" class="border border-slate-800 bg-slate-950 p-8 text-white shadow-[0_22px_44px_rgba(15,23,42,0.14)]">
         <div class="max-w-3xl">
-          <div class="text-sm font-semibold uppercase tracking-[0.14em] text-amber-300">{{ copy.title }}</div>
           <h1 class="mt-2 text-4xl font-semibold tracking-tight text-white">{{ copy.title }}</h1>
           <p class="mt-4 text-base leading-7 text-slate-300">{{ copy.body }}</p>
         </div>
@@ -249,16 +291,17 @@ onBeforeUnmount(() => {
           :key="project.title"
           type="button"
           data-reveal="card"
+          data-hover-lift
           :style="{ '--reveal-delay': `${90 + index * 80}ms` }"
-          class="group overflow-hidden border border-slate-200 bg-white text-left shadow-[0_16px_32px_rgba(15,23,42,0.04)] transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_24px_44px_rgba(15,23,42,0.08)] focus:outline-none focus:ring-4 focus:ring-amber-300/35"
+          class="group overflow-hidden border border-slate-200 bg-white text-left shadow-[0_16px_32px_rgba(15,23,42,0.04)] transition-shadow duration-300 will-change-transform hover:border-slate-300 hover:shadow-[0_24px_44px_rgba(15,23,42,0.08)] focus:outline-none focus:ring-4 focus:ring-amber-300/35"
           @click="openProject(index)"
         >
-          <div class="relative h-56 bg-[linear-gradient(145deg,#111827,#334155)] sm:h-60">
+          <div class="relative h-56 overflow-hidden bg-[linear-gradient(145deg,#111827,#334155)] sm:h-60">
             <img
               v-if="project.image"
               :src="project.image"
               :alt="project.title"
-              class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+              class="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.07]"
             />
             <div class="absolute inset-0 bg-[linear-gradient(to_top,rgba(15,23,42,0.35),transparent_55%)] opacity-0 transition group-hover:opacity-100"></div>
             <div class="absolute left-4 top-4 bg-white/90 px-3 py-1 text-xs font-semibold text-slate-900">
@@ -282,14 +325,15 @@ onBeforeUnmount(() => {
     </section>
 
     <Teleport to="body">
-      <div
-        v-if="selectedProject"
-        class="fixed inset-0 z-[80] overflow-y-auto bg-slate-950/70 px-4 py-6 backdrop-blur-sm"
-        role="dialog"
-        aria-modal="true"
-        @click.self="closeProject"
-      >
-        <div class="mx-auto max-w-5xl overflow-hidden bg-white shadow-[0_30px_70px_rgba(15,23,42,0.35)]">
+      <Transition :css="false" @enter="onModalEnter" @leave="onModalLeave">
+        <div
+          v-if="selectedProject"
+          class="fixed inset-0 z-[80] overflow-y-auto bg-slate-950/70 px-4 py-6 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          @click.self="closeProject"
+        >
+          <div data-modal-panel class="mx-auto max-w-5xl overflow-hidden bg-white shadow-[0_30px_70px_rgba(15,23,42,0.35)]">
           <div class="grid lg:grid-cols-[1.05fr_0.95fr]">
             <div class="relative min-h-[18rem] bg-slate-900 lg:min-h-[34rem]">
               <img
@@ -350,8 +394,9 @@ onBeforeUnmount(() => {
               </div>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </Transition>
     </Teleport>
   </PublicLayout>
 </template>

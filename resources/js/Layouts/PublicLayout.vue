@@ -1,7 +1,10 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { PUBLIC_MESSAGES } from '@/i18n/public'
+import { applyReveals } from '@/composables/useReveals'
 
 const page = usePage()
 const user = computed(() => page.props.auth?.user ?? null)
@@ -13,7 +16,7 @@ const scrollProgress = ref(0)
 const headerRef = ref(null)
 const logoRef = ref(null)
 const logoTone = ref('default')
-let revealObserver = null
+let revealCtx = null
 let logoToneFrame = null
 
 const locales = [
@@ -123,33 +126,14 @@ function scheduleLogoToneCheck() {
 function setupScrollReveals() {
   if (typeof window === 'undefined') return
 
-  const targets = Array.from(document.querySelectorAll('[data-reveal]'))
-
-  if (revealObserver) revealObserver.disconnect()
-
-  if (!targets.length) return
-
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    targets.forEach((el) => el.classList.add('is-visible'))
-    return
+  if (revealCtx) {
+    revealCtx.revert()
+    revealCtx = null
   }
 
-  revealObserver = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue
-
-        entry.target.classList.add('is-visible')
-
-        if (!entry.target.hasAttribute('data-reveal-repeat')) {
-          revealObserver?.unobserve(entry.target)
-        }
-      }
-    },
-    { threshold: 0.16, rootMargin: '0px 0px -8% 0px' }
-  )
-
-  targets.forEach((el) => revealObserver?.observe(el))
+  revealCtx = gsap.context(() => {
+    applyReveals(document.body)
+  })
 }
 
 onMounted(() => {
@@ -165,7 +149,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
   window.removeEventListener('resize', scheduleLogoToneCheck)
-  if (revealObserver) revealObserver.disconnect()
+  if (revealCtx) {
+    revealCtx.revert()
+    revealCtx = null
+  }
   if (logoToneFrame) window.cancelAnimationFrame(logoToneFrame)
 })
 
@@ -174,6 +161,7 @@ watch(pageUrl, () => {
   nextTick(() => {
     setupScrollReveals()
     updateLogoTone()
+    ScrollTrigger.refresh()
   })
 })
 </script>

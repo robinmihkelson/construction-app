@@ -1,7 +1,8 @@
 <script setup>
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import { Link, usePage } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { attachHoverLift, attachMagnetic } from '@/composables/useHover'
 
 const CONTENT = {
   et: {
@@ -87,21 +88,36 @@ const CONTENT = {
 const page = usePage()
 const locale = computed(() => page.props.locale ?? 'et')
 const copy = computed(() => CONTENT[locale.value] ?? CONTENT.et)
+
+const rootRef = ref(null)
+const ctaRef = ref(null)
+const cleanups = []
+
+onMounted(() => {
+  cleanups.push(attachHoverLift(rootRef.value ?? document))
+  const ctaEl = ctaRef.value?.$el ?? ctaRef.value
+  if (ctaEl) cleanups.push(attachMagnetic(ctaEl))
+})
+
+onBeforeUnmount(() => {
+  cleanups.forEach((fn) => fn())
+  cleanups.length = 0
+})
 </script>
 
 <template>
   <PublicLayout>
-    <section class="mx-auto max-w-[92rem] px-4 py-14 xl:px-6">
+    <section ref="rootRef" class="mx-auto max-w-[92rem] px-4 py-14 xl:px-6">
       <div data-nav-logo-tone="inverse" data-reveal="curtain" class="border border-slate-800 bg-slate-950 p-8 text-white shadow-[0_22px_44px_rgba(15,23,42,0.14)]">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div class="max-w-3xl">
-            <div class="text-sm font-semibold uppercase tracking-[0.14em] text-amber-300">{{ copy.title }}</div>
             <h1 class="mt-2 text-4xl font-semibold tracking-tight text-white">{{ copy.title }}</h1>
             <p class="mt-4 text-base leading-7 text-slate-300">{{ copy.body }}</p>
           </div>
           <Link
+            ref="ctaRef"
             href="/contact"
-            class="inline-flex items-center bg-amber-400 px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-slate-950 transition hover:bg-amber-300"
+            class="inline-flex items-center bg-amber-400 px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-slate-950 transition will-change-transform hover:bg-amber-300"
           >
             {{ copy.cta }}
           </Link>
@@ -113,8 +129,9 @@ const copy = computed(() => CONTENT[locale.value] ?? CONTENT.et)
           v-for="(group, index) in copy.groups"
           :key="group.title"
           data-reveal="card"
+          data-hover-lift
           :style="{ '--reveal-delay': `${90 + index * 95}ms` }"
-          class="relative border border-slate-200 bg-white p-7 shadow-[0_16px_32px_rgba(15,23,42,0.04)]"
+          class="relative border border-slate-200 bg-white p-7 shadow-[0_16px_32px_rgba(15,23,42,0.04)] transition-shadow duration-300 will-change-transform hover:shadow-[0_22px_44px_rgba(15,23,42,0.08)]"
         >
           <div class="absolute right-5 top-3 text-6xl font-semibold leading-none text-slate-100">
             0{{ index + 1 }}
