@@ -1,9 +1,7 @@
 <script setup>
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import { useForm, usePage } from '@inertiajs/vue3'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { computed } from 'vue'
 
 const CONTENT = {
   et: {
@@ -92,35 +90,6 @@ function sanitizePhoneInput(event) {
 function submit() {
   form.post(route('public.contact.store'), { preserveScroll: true })
 }
-
-const formRef = ref(null)
-let ctx = null
-
-onMounted(() => {
-  if (typeof window === 'undefined') return
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  if (!formRef.value) return
-
-  ctx = gsap.context(() => {
-    gsap.from('[data-field]', {
-      y: 18,
-      opacity: 0,
-      duration: 0.55,
-      ease: 'power3.out',
-      stagger: 0.07,
-      delay: 0.15,
-      scrollTrigger: {
-        trigger: formRef.value,
-        start: 'top 85%',
-        once: true,
-      },
-    })
-  }, formRef.value)
-})
-
-onBeforeUnmount(() => {
-  if (ctx) ctx.revert()
-})
 </script>
 
 <template>
@@ -151,9 +120,9 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div ref="formRef" data-reveal="slide-left" class="border border-slate-200 bg-white p-8 shadow-[0_20px_40px_rgba(15,23,42,0.05)]">
+        <div data-reveal="slide-left" class="border border-slate-200 bg-white p-8 shadow-[0_20px_40px_rgba(15,23,42,0.05)]">
           <form @submit.prevent="submit" class="space-y-5">
-            <div data-field>
+            <div>
               <label class="text-sm font-semibold text-slate-900">{{ copy.fields.name }}</label>
               <input
                 v-model="form.name"
@@ -162,7 +131,7 @@ onBeforeUnmount(() => {
               <div v-if="form.errors.name" class="mt-2 text-sm text-red-600">{{ form.errors.name }}</div>
             </div>
 
-            <div data-field class="grid gap-5 sm:grid-cols-2">
+            <div class="grid gap-5 sm:grid-cols-2">
               <div>
                 <label class="text-sm font-semibold text-slate-900">{{ copy.fields.email }}</label>
                 <input
@@ -190,7 +159,7 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <div data-field>
+            <div>
               <label class="text-sm font-semibold text-slate-900">{{ copy.fields.message }}</label>
               <textarea
                 v-model="form.message"
@@ -201,7 +170,6 @@ onBeforeUnmount(() => {
             </div>
 
             <button
-              data-field
               type="submit"
               :disabled="form.processing"
               class="inline-flex w-full items-center justify-center bg-slate-950 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
