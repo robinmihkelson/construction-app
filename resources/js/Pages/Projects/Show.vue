@@ -40,6 +40,12 @@ const statusCounts = computed(() => ({
     doing: props.tasks.filter((t) => t.status === 'doing').length,
     done:  props.tasks.filter((t) => t.status === 'done').length,
 }))
+const totalTaskCount = computed(() => props.tasks.length)
+const completedTaskCount = computed(() => statusCounts.value.done)
+const taskCompletionPercent = computed(() =>
+    totalTaskCount.value === 0 ? 0 : Math.round((completedTaskCount.value / totalTaskCount.value) * 100)
+)
+const taskCompletionStyle = computed(() => ({ width: `${taskCompletionPercent.value}%` }))
 
 let removeStart, removeFinish
 
@@ -547,6 +553,33 @@ function saveRename() {
                 >
                     <span class="text-sm font-medium text-[var(--slate)]">{{ statusLabel(status) }}</span>
                     <span class="text-lg font-bold text-[var(--ink)]">{{ statusCounts[status] }}</span>
+                </div>
+            </div>
+
+            <div class="mt-4 rounded-lg border border-[var(--line)] bg-[var(--panel-strong)] px-4 py-3">
+                <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <div class="app-label">{{ t('projects.task_completion') }}</div>
+                        <div class="mt-0.5 text-sm font-semibold text-[var(--ink)]">
+                            {{ taskCompletionPercent }}% {{ t('projects.complete') }}
+                        </div>
+                    </div>
+                    <div class="text-xs font-semibold text-[var(--slate-soft)]">
+                        {{ completedTaskCount }} / {{ totalTaskCount }} {{ t('projects.tasks_done') }}
+                    </div>
+                </div>
+                <div
+                    class="h-2.5 overflow-hidden rounded-full bg-white ring-1 ring-inset ring-[var(--line)] dark:bg-slate-950/30"
+                    role="progressbar"
+                    :aria-label="t('projects.task_completion')"
+                    :aria-valuenow="taskCompletionPercent"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                >
+                    <div
+                        class="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                        :style="taskCompletionStyle"
+                    ></div>
                 </div>
             </div>
         </div>
